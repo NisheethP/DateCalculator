@@ -62,6 +62,109 @@ int Date::getYear()
 	return year;
 }
 
+//=============================
+//CLASS OPERATOR OVERLOADS
+//=============================
+int Date::operator- (Date date)
+{
+	if (month != Error)
+	{
+		boost::gregorian::date DateSec(date.date, date.month, date.year);
+		boost::gregorian::date DateFir(this->date, this->month, this->year);
+
+		boost::gregorian::date_duration DateGap = DateFir - DateSec;
+
+		return DateGap.days();
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+bool Date::operator< (Date date)
+{
+	if (this->year < date.year)
+	{
+		if (this->month < date.month)
+		{
+			if (this->date < date.date)
+			{
+				return true;
+			}
+		}
+	}
+	else
+		return false;
+}
+
+bool Date::operator>(Date date)
+{
+	if (this->year > date.year)
+	{
+		if (this->month > date.month)
+		{
+			if (this->date > date.date)
+			{
+				return true;
+			}
+		}
+	}
+
+	else
+		return false;
+}
+
+bool Date::operator<=(Date date)
+{
+	if (this->year <= date.year)
+	{
+		if (this->month <= date.month)
+		{
+			if (this->date <= date.date)
+			{
+				return true;
+			}
+		}
+	}
+	else
+		return false;
+}
+
+bool Date::operator>=(Date date)
+{
+	if (this->year >= date.year)
+	{
+		if (this->month >= date.month)
+		{
+			if (this->date >= date.date)
+			{
+				return true;
+			}
+		}
+	}
+
+	else
+		return false;
+}
+
+bool Date::operator==(Date date)
+{
+	if (this->year == date.year)
+	{
+		if (this->month == date.month)
+		{
+			if (this->date == date.date)
+			{
+				return true;
+			}
+		}
+	}
+
+	else
+		return false;
+}
+
 
 //=============================
 //OTHER FUNCTIONS

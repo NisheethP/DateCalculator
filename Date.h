@@ -24,16 +24,6 @@ enum Month
 };
 
 //=============================
-//STRUCT FOR DATE DIFFERENCE
-//=============================
-struct DateDiff
-{
-	int years;
-	int months;
-	int days;
-};
-
-//=============================
 //CLASS TO HANDLE DATES
 //=============================
 class Date
@@ -57,16 +47,20 @@ public:
 	void setMonth(Month pMonth);
 	void setDate(int pDate);
 
-	//FUNCTIONS TO INTERACT WITH DATES
+	//OPERATOR OVERLOADS
+	int operator- (Date date);
+	bool operator< (Date date);
+	bool operator> (Date date);
+	bool operator<=(Date date);
+	bool operator>=(Date date);
+	bool operator==(Date date);
 };
-
-
 
 //=============================
 //OTHER HELPUL FUNCTIONS
 //=============================
 bool MonthToStr(Month pMonth, std::string &monthName);
 bool GetMonth(std::string monthName, Month &month);
-Month ConvMonth(boost::gregorian::date pDate);
+Month ConvMonth(boost::gregorian::greg_month pMonth);
 
 #endif
