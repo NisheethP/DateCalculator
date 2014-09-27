@@ -1,17 +1,25 @@
 #include "Table.h"
+#include <Windows.h>
 
 using TableSpace::Table;
+using TableSpace::Global;
 
 //==============================
 // STATIC CLASS MEMBERS
 //==============================
+
+//~~~~TABLE~~~~//
 int Table::MAX_ROW = 25;
+
+//~~~~TABLE~~~~//
+HANDLE Global::hStdin = GetStdHandle(STD_INPUT_HANDLE);
+HANDLE Global::hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 
 //==============================
 // CLASS FUNCTIONS
 //==============================
 
-TableSpace::Table::Table(int pRow, Coord pInitCoord, Coord pInitHiCoord, Coord pDeltaCoord) :
+Table::Table(int pRow, Coord pInitCoord, Coord pInitHiCoord, Coord pDeltaCoord) :
 row(pRow)
 {
 	initCoord = new Coord;
@@ -32,12 +40,11 @@ row(pRow)
 	*initHiCoord = pInitHiCoord;
 
 }
-TableSpace::Table::Table()
+Table::Table()
 {
 	Table(1, { 0, 0 }, { 0, 0 }, { 0, 0 });
 }
-
-TableSpace::Table::~Table()
+Table::~Table()
 {
 	delete initCoord;
 	delete hiCoord;
@@ -90,7 +97,6 @@ int Table::getCol()
 {
 	return column;
 }
-
 Table::Coord Table::getInitCoord()
 {
 	return *initCoord;
@@ -293,6 +299,18 @@ void Table::drawTable()
 				cout << "|";
 			else
 			{
+				switch (colDataIter)
+				{
+				case 0:
+					cout << tableData[row].getDate();
+					break;
+				case 1:
+					cout << "";
+					break;
+				case 2:
+					cout << tableData[row].getYear();
+					break;
+				}
 
 				if (colDataIter < column)
 					++colDataIter;
