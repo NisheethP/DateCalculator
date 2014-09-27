@@ -3,9 +3,12 @@
 #ifndef _DATE_H_
 #define _DATE_H_
 
+#include <string>
+#include <boost\date_time\gregorian\gregorian.hpp>
 
 enum Month
 {
+	Error = 0,
 	January = 1,
 	February,
 	March,
@@ -56,5 +59,14 @@ public:
 
 	//FUNCTIONS TO INTERACT WITH DATES
 };
+
+
+
+//=============================
+//OTHER HELPUL FUNCTIONS
+//=============================
+bool MonthToStr(Month pMonth, std::string &monthName);
+bool GetMonth(std::string monthName, Month &month);
+Month ConvMonth(boost::gregorian::date pDate);
 
 #endif
