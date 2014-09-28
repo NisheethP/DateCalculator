@@ -20,6 +20,25 @@ using std::cout;
 
 namespace TableSpace
 {
+	enum Colour
+	{
+		Gray,
+		White,
+		DarkRed, 
+		Red,
+		DarkBlue,
+		Blue,
+		DarkGreen,
+		Green,
+		DarkCyan,
+		Cyan,
+		DarkMagenta,
+		Magenta, 
+		DarkYellow, 
+		Yellow, 
+		None
+	};
+
 	struct Global
 	{
 		static HANDLE hStdin;
@@ -37,13 +56,11 @@ namespace TableSpace
 	private:
 		//Defining of data types
 		typedef vector<Date> DateVector;
-		typedef vector<string> StrVector;
 
 		static int MAX_ROW;
 		int row;
 		int column;
 
-		StrVector colNames;
 		DateVector tableData;
 
 		Coord *initCoord;
@@ -57,7 +74,6 @@ namespace TableSpace
 		int static wherex();
 		int static wherey();
 		bool isOdd(int x) { return (x % 2) ? true : false; }
-		int strMid(string);
 
 	public:
 		Table();
@@ -92,16 +108,12 @@ namespace TableSpace
 			}
 		};
 
-		void hilight(Coord, int);
-		void delight(Coord, int);
-
 		void setRow(int);
 		void setCol(int);
 		void setInitCoord(Coord);
 		void setDeltaCoord(Coord);
 		void setHiCoord(Coord);
 		void setInitHiCoord(Coord);
-		void setColNames(StrVector);
 		boost::any getTupleTerm(int row, int col);
 
 
@@ -111,7 +123,6 @@ namespace TableSpace
 		Coord getDeltaCoord();
 		Coord getHiCoord();
 		Coord getInitHiCoord();
-		StrVector getColNames();
 
 		void drawTable();
 
@@ -120,5 +131,14 @@ namespace TableSpace
 
 		~Table();
 	};
+
+
+	WORD ColourToFore(Colour);
+	WORD ColourToBack(Colour);
+	
+	void SetDefaultColour(Colour colour = TableSpace::Colour::White);
+
+	void hilight(Table::Coord crd, int length, Colour fore = Colour::DarkBlue, Colour back = Colour::White);
+	void delight(Table::Coord crd, int length, Colour fore = Colour::White, Colour back = Colour::None);
 }
 #endif
