@@ -3,8 +3,14 @@
 using std::string;
 
 //=============================
+//=============================
 //CLASS FUNCTIONS
 //=============================
+//=============================
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//CONSTRUCTORS & DESTRUCTORS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Date::Date()
 {
 	boost::gregorian::date Today(boost::gregorian::day_clock::local_day());
@@ -25,9 +31,9 @@ Date::~Date()
 {
 }
 
-//=============================
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //CLASS SETTING FUNCTIONS
-//=============================
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void Date::setDate(int pDate)
 {
 	date = pDate;
@@ -44,9 +50,9 @@ void Date::setYear(int pYear)
 }
 
 
-//=============================
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //CLASS GETTING FUNCTIONS
-//=============================
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int Date::getDate()
 {
 	return date;
@@ -62,9 +68,9 @@ int Date::getYear()
 	return year;
 }
 
-//=============================
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //CLASS OPERATOR OVERLOADS
-//=============================
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int Date::operator- (Date date)
 {
 	if (month != Error)
@@ -165,9 +171,24 @@ bool Date::operator==(Date date)
 		return false;
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//CONVERSION FUNCTIONS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+boost::gregorian::date Date::toDate()
+{
+	boost::gregorian::date tDate(date, month, year);
+
+	if (tDate.is_not_a_date())
+		return boost::gregorian::date(-1,-1,-1);
+	else
+		return tDate;
+}
+
 
 //=============================
+//=============================
 //OTHER FUNCTIONS
+//=============================
 //=============================
 
 bool MonthToStr(Month pMonth, string &monthName)

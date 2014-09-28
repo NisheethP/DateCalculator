@@ -28,24 +28,25 @@ enum Month
 //=============================
 class Date
 {
-	int year;
+	typedef unsigned short ushort;
+	ushort year;
 	Month month;
-	int date;
+	ushort date;
 
 public:
-	Date(int year, Month month, int date);
+	Date(ushort year, Month month, ushort date);
 	Date();
 	~Date();
 
 	//FUNCTIONS TO GET VALUES
-	int getYear();
+	ushort getYear();
 	Month getMonth();
-	int getDate();
+	ushort getDate();
 
 	//FUNCTIONS TO SET VALUES
-	void setYear(int pYear);
+	void setYear(ushort pYear);
 	void setMonth(Month pMonth);
-	void setDate(int pDate);
+	void setDate(ushort pDate);
 
 	//OPERATOR OVERLOADS
 	int operator- (Date date);
@@ -54,6 +55,9 @@ public:
 	bool operator<=(Date date);
 	bool operator>=(Date date);
 	bool operator==(Date date);
+
+	//CONVERSION FUNCTION
+	boost::gregorian::date toDate();
 };
 
 //=============================

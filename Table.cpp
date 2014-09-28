@@ -1,5 +1,8 @@
 #include "Table.h"
 #include <Windows.h>
+#include <boost\date_time\gregorian\gregorian.hpp>
+#include <string>
+#include <sstream>
 
 using TableSpace::Table;
 using TableSpace::Global;
@@ -224,58 +227,8 @@ void Table::drawTable()
 	gotoxy(initCoord->x, initCoord->y);
 	Coord curCoord = { initCoord->x - deltaCoord->x, initCoord->y };
 
-	/*
-	*This section outputs the first row of the table.
-	*It consists of the names of the columns and the first dividers.
-	*The individual 'cout' is to output a vertical bar (|) for the
-	*divider line that separates row numbers
-	*/
-
-	gotoxy(curCoord.x, curCoord.y);
-	cout << "|";
-
-	int colNameIter = 0;
-
-	for (int colIter = 0; colIter < colDividers + column; ++colIter)
-	{
-		curCoord = { initCoord->x + colIter * deltaCoord->x, initCoord->y };
-
-		gotoxy(curCoord.x, curCoord.y);
-		if (isOdd(colIter))
-			cout << "|";
-		else
-		{
-			string str = colNames[colNameIter++];
-			curCoord.x -= strMid(str);
-			gotoxy(curCoord.x, curCoord.y);
-			cout << str;
-		}
-	}
-
-	/*
-	*This prints the second row of the table.
-	*This just outputs a series of '-' in a line
-	*to divide the column names from the entries.
-	*It outputs a '+' at every location that has
-	*a vertical bar (|) in the above and below
-	*row.
-	*/
-
-	curCoord = { initCoord->x - deltaCoord->x - 3, initCoord->y + 1 };
-	gotoxy(curCoord.x, curCoord.y);
-	for (int i = 0; i < 3; ++i)
-		cout << "-";
-
-	curCoord = { initCoord->x - deltaCoord->x, initCoord->y + 1 };
-
-	for (int i = 0; i < deltaCoord->x * (column + 2); ++i)
-	{
-		gotoxy(curCoord.x + i, curCoord.y);
-		if (i % (2 * deltaCoord->x) != 0)
-			cout << "-";
-		else
-			cout << "+";
-	}
+	//gotoxy(curCoord.x, curCoord.y);
+	//cout << "|";
 
 	/*
 	*This will output the various rows.
@@ -299,16 +252,30 @@ void Table::drawTable()
 				cout << "|";
 			else
 			{
+				std::string dateStr = boost::gregorian::to_iso_extended_string(tableData[row].toDate());
+
+				std::string dateYear, dateMonth, dateDate;
+				dateYear = dateMonth = dateDate = "";
+
+				for (int i = 0; i < 4; ++i)
+					dateYear += dateStr[i];
+
+				for (int i = 5; i < 7; ++i)
+					dateMonth += dateStr[i];
+
+				for (int i = 8; i < 10; ++i)
+					dateDate += dateStr[i];
+
 				switch (colDataIter)
 				{
 				case 0:
-					cout << tableData[row].getDate();
+					cout << dateDate;
 					break;
 				case 1:
-					cout << "";
+					cout << dateMonth;
 					break;
 				case 2:
-					cout << tableData[row].getYear();
+					cout << dateYear;
 					break;
 				}
 
