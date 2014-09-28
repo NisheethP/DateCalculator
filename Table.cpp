@@ -6,7 +6,9 @@
 
 using TableSpace::Table;
 using TableSpace::Global;
-
+using TableSpace::Colour;
+using TableSpace::hilight;
+using TableSpace::delight;
 //==============================
 // STATIC CLASS MEMBERS
 //==============================
@@ -34,14 +36,14 @@ row(pRow)
 		row = MAX_ROW;
 
 	column = 3;
-	for (int i = 0; i < column; ++i)
-		colNames.push_back("");
 
 	*initCoord = pInitCoord;
 	*hiCoord = pInitHiCoord;
 	*deltaCoord = pDeltaCoord;
 	*initHiCoord = pInitHiCoord;
 
+	for (int i = 0; i < pRow; ++i)
+		tableData.push_back(Date());
 }
 Table::Table()
 {
@@ -83,11 +85,6 @@ void Table::setInitHiCoord(Coord pCoord)
 {
 	*initHiCoord = pCoord;
 }
-void Table::setColNames(StrVector pColNames)
-{
-	colNames = pColNames;
-}
-
 //==============================
 // GETTING DATA MEMBER
 //==============================
@@ -115,10 +112,6 @@ Table::Coord Table::getHiCoord()
 Table::Coord Table::getInitHiCoord()
 {
 	return *initHiCoord;
-}
-Table::StrVector Table::getColNames()
-{
-	return colNames;
 }
 
 //=================================
@@ -181,40 +174,6 @@ Table::Coord Table::AbsToHi(Coord pCoord)
 	rCoord.y = getDeltaCoord().y * pCoord.y + getInitHiCoord().y;
 	return rCoord;
 }
-void Table::hilight(Coord crd, int length)
-{
-	WORD fore = FOREGROUND_BLUE;
-	WORD back = BACKGROUND_RED | BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
-
-	COORD cord;
-	DWORD wrd;
-	cord.X = crd.x;
-	cord.Y = crd.y;
-
-	FillConsoleOutputAttribute(Global::hStdout, fore | back, length, cord, &wrd);
-
-	//cout << endl;
-	//cout << wrd;
-}
-void Table::delight(Coord crd, int length)
-{
-	WORD fore = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-
-	COORD cord;
-	DWORD wrd;
-	cord.X = crd.x;
-	cord.Y = crd.y;
-
-	FillConsoleOutputAttribute(Global::hStdout, fore, length, cord, &wrd);
-
-	//cout << endl;
-	//cout << wrd;
-}
-int Table::strMid(string str)
-{
-	return (int)(str.length()) * 0.5f;
-}
-
 
 //==============================
 // TABLE INTERACTION
@@ -227,63 +186,231 @@ void Table::drawTable()
 	gotoxy(initCoord->x, initCoord->y);
 	Coord curCoord = { initCoord->x - deltaCoord->x, initCoord->y };
 
-	//gotoxy(curCoord.x, curCoord.y);
-	//cout << "|";
-
 	/*
-	*This will output the various rows.
-	*Tuple needs to be created to get a variable of
-	*each type in Parameter Pack. The default garbage value is used.
-	*/
+	 *This will output the various rows.
+	 *Tuple needs to be created to get a variable of
+	 *each type in Parameter Pack. The default garbage value is used.
+	 */
 
 	int rowDataIter = 0;
 	int colDataIter = 0;
 
-	for (int rowIter = 0; rowIter < row * deltaCoord->y; ++rowIter)
+	for (int rowIter = 0; rowIter < (row * deltaCoord->y) - 1; ++rowIter)
 	{
-		for (int colIter = 0; colIter < column * deltaCoord->x; ++colIter)
+		for (int colIter = 0; colIter < 2*column - 1 ; ++colIter)
 		{
 			curCoord = { initCoord->x + 2 * (deltaCoord->x*colIter), initCoord->y + deltaCoord->y*rowIter + 2 };
 
-			gotoxy(curCoord.x - 2 * deltaCoord->x + 2, curCoord.y);
-			if (colIter == 0)
-				cout << rowIter + 1;
-			else if (colIter % (2 * deltaCoord->x) == 0)
-				cout << "|";
+			boost::gregorian::date tempDate = tableData[rowDataIter].toDate();
+			std::string dateStr = boost::gregorian::to_iso_extended_string(tempDate);
+
+			std::string dateYear, dateMonth, dateDate;
+			dateYear = dateMonth = dateDate = "";
+			
+			for (int i = 0; i < 4; ++i)
+				dateYear += dateStr[i];					
+
+			for (int i = 8; i < 10; ++i)
+				dateDate += dateStr[i];
+
+			const int MonthCoord = (initCoord->x + 5);
+			const int YearCoord = (initCoord->x + 5) + 12;
+
+			MonthToStr(tableData[rowDataIter].getMonth(),dateMonth);
+
+			if (colIter%2 != 0)
+			{
+				if (colIter == 1)
+					curCoord.x = initCoord->x + 3;
+				else if (colIter == 3)
+					curCoord.x = initCoord->x + 15;
+
+				gotoxy(curCoord.x);
+				cout << "-";
+
+			}
 			else
 			{
-				std::string dateStr = boost::gregorian::to_iso_extended_string(tableData[row].toDate());
-
-				std::string dateYear, dateMonth, dateDate;
-				dateYear = dateMonth = dateDate = "";
-
-				for (int i = 0; i < 4; ++i)
-					dateYear += dateStr[i];
-
-				for (int i = 5; i < 7; ++i)
-					dateMonth += dateStr[i];
-
-				for (int i = 8; i < 10; ++i)
-					dateDate += dateStr[i];
-
 				switch (colDataIter)
 				{
 				case 0:
+					curCoord.x = initCoord->x;
+					gotoxy(curCoord.x);
 					cout << dateDate;
 					break;
 				case 1:
+					curCoord.x = MonthCoord;
+					gotoxy(curCoord.x);
 					cout << dateMonth;
 					break;
 				case 2:
+					curCoord.x = YearCoord;
+					gotoxy(curCoord.x);
 					cout << dateYear;
 					break;
 				}
 
 				if (colDataIter < column)
 					++colDataIter;
-			}
+			}		
 		}
-		if (rowDataIter < row)
+		if (rowDataIter < row-1)
 			++rowDataIter;
 	}
+}
+
+//==============================
+// OTHER FUNCTIONS
+//==============================
+
+WORD TableSpace::ColourToFore(Colour colour)
+{
+	WORD fore;
+	switch (colour)
+	{
+	case 0:
+		fore = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN;
+		break;
+	case 1:
+		fore = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+		break;
+	case 2:
+		fore = FOREGROUND_RED;
+		break;
+	case 3:
+		fore = FOREGROUND_RED | FOREGROUND_INTENSITY;
+		break;
+	case 4:
+		fore = FOREGROUND_BLUE;
+		break;
+	case 5:
+		fore = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+		break;
+	case 6:
+		fore = FOREGROUND_GREEN;
+		break;
+	case 7:
+		fore = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+		break;
+	case 8:
+		fore = FOREGROUND_BLUE | FOREGROUND_GREEN;
+		break;
+	case 9:
+		fore = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+		break;
+	case 10:
+		fore = FOREGROUND_BLUE | FOREGROUND_RED;
+		break;
+	case 11:
+		fore = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
+		break;
+	case 12:
+		fore = FOREGROUND_RED | FOREGROUND_GREEN;
+		break;
+	case 13:
+		fore = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+		break;
+	}
+
+	return fore;
+}
+WORD TableSpace::ColourToBack(Colour colour)
+{
+	WORD back;
+	switch (colour)
+	{
+	case 0:
+		back = BACKGROUND_RED | BACKGROUND_BLUE | BACKGROUND_GREEN;
+		break;
+	case 1:
+		back = BACKGROUND_RED | BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+		break;
+	case 2:
+		back = BACKGROUND_RED;
+		break;
+	case 3:
+		back = BACKGROUND_RED | BACKGROUND_INTENSITY;
+		break;
+	case 4:
+		back = BACKGROUND_BLUE;
+		break;
+	case 5:
+		back = BACKGROUND_BLUE | BACKGROUND_INTENSITY;
+		break;
+	case 6:
+		back = BACKGROUND_GREEN;
+		break;
+	case 7:
+		back = BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+		break;
+	case 8:
+		back = BACKGROUND_BLUE | BACKGROUND_GREEN;
+		break;
+	case 9:
+		back = BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+		break;
+	case 10:
+		back = BACKGROUND_BLUE | BACKGROUND_RED;
+		break;
+	case 11:
+		back = BACKGROUND_BLUE | BACKGROUND_RED | BACKGROUND_INTENSITY;
+		break;
+	case 12:
+		back = BACKGROUND_RED | BACKGROUND_GREEN;
+		break;
+	case 13:
+		back = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+		break;
+	}
+
+	return back;
+}
+void TableSpace::SetDefaultColour(Colour colour)
+{
+	WORD fore = TableSpace::ColourToFore(colour);
+	SetConsoleTextAttribute(Global::hStdout, fore);
+}
+void TableSpace::hilight(Table::Coord crd, int length, Colour Fore, Colour Back)
+{
+	COORD cord;
+	DWORD wrd;
+	cord.X = crd.x;
+	cord.Y = crd.y;
+
+	if (Back == TableSpace::Colour::None)
+	{
+		WORD fore = TableSpace::ColourToFore(Fore);
+		FillConsoleOutputAttribute(Global::hStdout, fore, length, cord, &wrd);
+	}
+	else
+	{
+		WORD fore = TableSpace::ColourToFore(Fore);
+		WORD back = TableSpace::ColourToBack(Back);
+		FillConsoleOutputAttribute(Global::hStdout, fore | back, length, cord, &wrd);
+	}
+
+	//cout << endl;
+	//cout << wrd;
+}
+void TableSpace::delight(Table::Coord crd, int length, Colour Fore, Colour Back)
+{
+	COORD cord;
+	DWORD wrd;
+	cord.X = crd.x;
+	cord.Y = crd.y;
+
+	if (Back == TableSpace::Colour::None)
+	{
+		WORD fore = TableSpace::ColourToFore(Fore);
+		FillConsoleOutputAttribute(Global::hStdout, fore, length, cord, &wrd);
+	}
+	else
+	{
+		WORD fore = TableSpace::ColourToFore(Fore);
+		WORD back = TableSpace::ColourToBack(Back);
+		FillConsoleOutputAttribute(Global::hStdout, fore | back, length, cord, &wrd);
+	}
+
+	//cout << endl;
+	//cout << wrd;
 }
