@@ -24,7 +24,7 @@ HANDLE Global::hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 // CLASS FUNCTIONS
 //==============================
 
-Table::Table(int pRow, Coord pInitCoord, Coord pInitHiCoord, Coord pDeltaCoord) :
+Table::Table(int pRow, Coord pInitCoord, Coord pDeltaCoord) :
 row(pRow)
 {
 	initCoord = new Coord;
@@ -38,16 +38,16 @@ row(pRow)
 	column = 3;
 
 	*initCoord = pInitCoord;
-	*hiCoord = pInitHiCoord;
+	*hiCoord = pInitCoord;
 	*deltaCoord = pDeltaCoord;
-	*initHiCoord = pInitHiCoord;
+	*initHiCoord = pInitCoord;
 
 	for (int i = 0; i < pRow; ++i)
 		tableData.push_back(Date());
 }
 Table::Table()
 {
-	Table(1, { 0, 0 }, { 0, 0 }, { 0, 0 });
+	Table(1, { 0, 0 }, { 0, 0 });
 }
 Table::~Table()
 {
@@ -85,6 +85,16 @@ void Table::setInitHiCoord(Coord pCoord)
 {
 	*initHiCoord = pCoord;
 }
+void Table::setDate(Date pDate, int pRow)
+{
+	if (pRow < row && pRow >= 0)
+	{
+		tableData[pRow] = pDate;
+	}
+	else
+		throw Exceptions::TableRowOutOfBound(row, pRow);
+}
+
 //==============================
 // GETTING DATA MEMBER
 //==============================
@@ -112,6 +122,13 @@ Table::Coord Table::getHiCoord()
 Table::Coord Table::getInitHiCoord()
 {
 	return *initHiCoord;
+}
+Date Table::getDate(int pRow)
+{
+	if (pRow >= row)
+		throw Exceptions::TableRowOutOfBound(row, pRow);
+
+	return tableData[pRow];
 }
 
 //=================================
