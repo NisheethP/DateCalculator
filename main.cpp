@@ -3,20 +3,20 @@
 #include <iostream>
 
 using TableSpace::Table;
-
+typedef boost::gregorian::date bDate;
 //==============================
 // FUNCTIONS DECLERATION
 //==============================
 
-void ReduceDate(boost::gregorian::date &pDate);
-void ReduceMonth(boost::gregorian::date &pDate);
-void ReduceYear(boost::gregorian::date &pDate);
-void ReduceAllDate(boost::gregorian::date &pDate);
+void ReduceDate(bDate &pDate, bDate pCurDate);
+void ReduceMonth(bDate &pDate, bDate pCurDate);
+void ReduceYear(bDate &pDate);
+void ReduceAllDate(bDate &pDate, bDate pCurDate);
 
-void IncreaseDate(boost::gregorian::date &pDate);
-void IncreaseMonth(boost::gregorian::date &pDate);
-void IncreaseYear(boost::gregorian::date &pDate);
-void IncreaseAllDate(boost::gregorian::date &pDate);
+void IncreaseDate(bDate &pDate, bDate pCurDate);
+void IncreaseMonth(bDate &pDate, bDate pCurDate);
+void IncreaseYear(bDate &pDate);
+void IncreaseAllDate(bDate &pDate, bDate pCurDate);
 
 //==============================
 // MAIN FUNCTION
@@ -45,16 +45,15 @@ int main()
 	 *Similarly for the second one which will go ahead instead.
 	 *This is so that the date can be shown in three rows. One will show the options if you
 	 *Press UP and another for DOWN.
-	 *When in the input handling loop, The date in Date1, Date1_Yesterday and Date1_Morrow to
-	 *Should be adjusted simultaneously.
+	 *When in the input handling loop, The date in Date1, Date1_Yesterday and Date1_Morrow
+	 *should be adjusted simultaneously.
 	 */
 	
 	date1_Yesterday = Date1_Yesterday.getDate(0).toDate();
 	date1_Morrow = Date1_Morrow.getDate(0).toDate();
 
-	ReduceAllDate(date1_Yesterday);
-	IncreaseAllDate(date1_Morrow);
-	IncreaseDate(date1_Morrow);
+	ReduceAllDate(date1_Yesterday, Date1.getDate(0).toDate());
+	IncreaseAllDate(date1_Morrow, Date1.getDate(0).toDate());
 	
 	Date1_Yesterday.setDate(date1_Yesterday,0);
 	Date1_Morrow.setDate(date1_Morrow,0);
@@ -76,42 +75,67 @@ int main()
 
 //THE FUNCTIONS TO REDUCE FROM DATE
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ReduceDate(boost::gregorian::date &pDate)
+void ReduceDate(bDate &pDate, bDate pCurDate)
 {
-	pDate -= boost::gregorian::days(1);
+	int maxCurDate = pCurDate.end_of_month().day();
+	if (pDate.day() == 1)
+	{
+		pDate = Date(maxCurDate, (Month)pDate.month().as_enum(), pDate.year()).toDate();
+	}
+	else
+		pDate = Date(pDate.day() - 1, (Month)pDate.month().as_enum(), pDate.year()).toDate();
 }
-void ReduceMonth(boost::gregorian::date &pDate)
+void ReduceMonth(bDate &pDate, bDate pCurDate)
 {
-	pDate -= boost::gregorian::months(1);
+	if (pDate.month().as_enum() == Month::January)
+	{
+		pDate = Date(pDate.day(), Month::December, pDate.year()).toDate();
+	}
+	else
+		pDate = Date(pDate.day(), (Month)(pDate.month().as_enum() - 1), pDate.year()).toDate();
+
 }
-void ReduceYear(boost::gregorian::date &pDate)
+void ReduceYear(bDate &pDate)
 {
 	pDate -= boost::gregorian::years(1);
 }
-void ReduceAllDate(boost::gregorian::date &pDate)
+void ReduceAllDate(bDate &pDate, bDate pCurDate)
 {
-	ReduceDate(pDate);
-	ReduceMonth(pDate);
+	ReduceDate(pDate, pCurDate);
+	ReduceMonth(pDate, pCurDate);
 	ReduceYear(pDate);
 }
 
 //INCREASE THE DATE
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void IncreaseDate(boost::gregorian::date &pDate)
+void IncreaseDate(bDate &pDate, bDate pCurDate)
 {
-	pDate += boost::gregorian::days(1);
+	int maxCurDate = pCurDate.end_of_month().day();
+	if (pDate.day() == maxCurDate)
+	{
+		pDate = Date(1, (Month)pDate.month().as_enum(), pDate.year()).toDate();
+		ReduceMonth(pDate, pCurDate);
+	}
+	else
+		pDate = Date(pDate.day() + 1, (Month)pDate.month().as_enum(), pDate.year()).toDate();
+
 }
-void IncreaseMonth(boost::gregorian::date &pDate)
+void IncreaseMonth(bDate &pDate, bDate pCurDate)
 {
-	pDate += boost::gregorian::months(1);
+	if ((Month)pDate.month().as_enum() == Month::December)
+	{
+		pDate = Date(pDate.day(), Month::January, pDate.year()).toDate();
+	}
+	else
+		pDate = Date(pDate.day(), (Month)(pDate.month().as_enum() + 1), pDate.year()).toDate();
 }
-void IncreaseYear(boost::gregorian::date &pDate)
+void IncreaseYear(bDate &pDate)
 {
 	pDate += boost::gregorian::years(1);
 }
-void IncreaseAllDate(boost::gregorian::date &pDate)
+void IncreaseAllDate(bDate &pDate, bDate pCurDate)
 {
-	IncreaseDate(pDate);
-	IncreaseMonth(pDate);
+	IncreaseDate(pDate, pCurDate);
+	IncreaseMonth(pDate, pCurDate);
 	IncreaseYear(pDate);
 }
