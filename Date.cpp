@@ -19,14 +19,18 @@ Date::Date()
 	month = ConvMonth(Today.month());
 	date = Today.day();
 }
-
-Date::Date(int pDate, Month pMonth, int pYear)
+Date::Date(ushort pDate, Month pMonth, ushort pYear)
 {
 	date = pDate;
 	month = pMonth;
 	year = pYear;
 }
-
+Date::Date(boost::gregorian::date pDate)
+{
+	date = pDate.day();
+	month = (Month)pDate.month().as_enum();
+	year = pDate.year();
+}
 Date::~Date()
 {
 }
@@ -34,17 +38,16 @@ Date::~Date()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //CLASS SETTING FUNCTIONS
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void Date::setDate(int pDate)
+
+void Date::setDate(ushort pDate)
 {
 	date = pDate;
 }
-
 void Date::setMonth(Month pMonth)
 {
 	month = pMonth;
 }
-
-void Date::setYear(int pYear)
+void Date::setYear(ushort pYear)
 {
 	year = pYear;
 }
@@ -53,17 +56,16 @@ void Date::setYear(int pYear)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //CLASS GETTING FUNCTIONS
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int Date::getDate()
+
+Date::ushort Date::getDate()
 {
 	return date;
 }
-
 Month Date::getMonth()
 {
 	return month;
 }
-
-int Date::getYear()
+Date::ushort Date::getYear()
 {
 	return year;
 }
@@ -87,7 +89,6 @@ int Date::operator- (Date date)
 		return 0;
 	}
 }
-
 bool Date::operator< (Date date)
 {
 	if (this->year < date.year)
@@ -100,10 +101,8 @@ bool Date::operator< (Date date)
 			}
 		}
 	}
-	else
-		return false;
+	return false;
 }
-
 bool Date::operator>(Date date)
 {
 	if (this->year > date.year)
@@ -117,10 +116,8 @@ bool Date::operator>(Date date)
 		}
 	}
 
-	else
-		return false;
+	return false;
 }
-
 bool Date::operator<=(Date date)
 {
 	if (this->year <= date.year)
@@ -133,10 +130,8 @@ bool Date::operator<=(Date date)
 			}
 		}
 	}
-	else
-		return false;
+	return false;
 }
-
 bool Date::operator>=(Date date)
 {
 	if (this->year >= date.year)
@@ -150,10 +145,8 @@ bool Date::operator>=(Date date)
 		}
 	}
 
-	else
-		return false;
+	return false;
 }
-
 bool Date::operator==(Date date)
 {
 	if (this->year == date.year)
@@ -166,9 +159,8 @@ bool Date::operator==(Date date)
 			}
 		}
 	}
-
-	else
-		return false;
+	
+	return false;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,14 +168,19 @@ bool Date::operator==(Date date)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 boost::gregorian::date Date::toDate()
 {
-	boost::gregorian::date tDate(date, month, year);
+	boost::gregorian::months_of_year enumMonth = (boost::gregorian::months_of_year)month;
+
+	boost::gregorian::greg_month gMonth(enumMonth);
+	boost::gregorian::greg_day gDay(date);
+	boost::gregorian::greg_year gYear(year);
+
+	boost::gregorian::date tDate(gYear,gMonth,gDay);
 
 	if (tDate.is_not_a_date())
 		return boost::gregorian::date(-1,-1,-1);
 	else
 		return tDate;
 }
-
 
 //=============================
 //=============================

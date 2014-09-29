@@ -35,6 +35,7 @@ class Date
 
 public:
 	Date(ushort year, Month month, ushort date);
+	Date(boost::gregorian::date);
 	Date();
 	~Date();
 
