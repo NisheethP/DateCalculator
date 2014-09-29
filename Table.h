@@ -38,7 +38,6 @@ namespace TableSpace
 		Yellow, 
 		None
 	};
-
 	struct Global
 	{
 		static HANDLE hStdin;
@@ -77,7 +76,7 @@ namespace TableSpace
 
 	public:
 		Table();
-		Table(int pRow, Coord pInitCoord, Coord pInitHiCoord, Coord pDeltaCoord);
+		Table(int pRow, Coord pInitCoord, Coord pDeltaCoord);
 
 		class Coord
 		{
@@ -114,8 +113,7 @@ namespace TableSpace
 		void setDeltaCoord(Coord);
 		void setHiCoord(Coord);
 		void setInitHiCoord(Coord);
-		boost::any getTupleTerm(int row, int col);
-
+		void setDate(Date pDate, int pRow);
 
 		int getRow();
 		int getCol();
@@ -123,6 +121,7 @@ namespace TableSpace
 		Coord getDeltaCoord();
 		Coord getHiCoord();
 		Coord getInitHiCoord();
+		Date getDate(int pRow);
 
 		void drawTable();
 
@@ -141,4 +140,25 @@ namespace TableSpace
 	void hilight(Table::Coord crd, int length, Colour fore = Colour::DarkBlue, Colour back = Colour::White);
 	void delight(Table::Coord crd, int length, Colour fore = Colour::White, Colour back = Colour::None);
 }
+
+namespace Exceptions
+{
+	class Codes
+	{
+
+	};
+
+	class TableRowOutOfBound : public Codes
+	{
+		int maxRows;
+		int rowParam;
+	public:
+		TableRowOutOfBound(int pMaxRow, int pRowParam)
+		{
+			maxRows = pMaxRow;
+			rowParam = pRowParam;
+		}
+	};
+}
+
 #endif
