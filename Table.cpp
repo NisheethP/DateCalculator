@@ -173,22 +173,26 @@ int Table::wherey()
 Table::Coord Table::HiToAbs(Coord pCoord)
 {
 	Coord rCoord = { 0, 0 };
+	rCoord.y = getInitHiCoord().y;
 
-	rCoord.x = pCoord.x - getInitHiCoord().x;
-	rCoord.x /= getDeltaCoord().x;
-
-	rCoord.y = pCoord.y - getInitHiCoord().y;
-	rCoord.y /= getDeltaCoord().y;
+	if (pCoord.x == getInitHiCoord().x)
+		rCoord.x = 0;
+	else if (pCoord.x == getInitHiCoord().x + 5)
+		rCoord.x = 1;
+	else if (pCoord.x == getInitHiCoord().x + 5 + 12)		// SPLIT IN TWO PARTS TO MAKE OBVIOUS THAT I AM MOVING FORWARD IN TWO PARTS
+		rCoord.x = 2;
 
 	return rCoord;
 }
 Table::Coord Table::AbsToHi(Coord pCoord)
 {
-	Coord rCoord = { 0, 0 };
-
-	rCoord.x = getDeltaCoord().x * pCoord.x + getInitHiCoord().x;
-
-	rCoord.y = getDeltaCoord().y * pCoord.y + getInitHiCoord().y;
+	Coord rCoord = getInitHiCoord();
+	if (pCoord.x == 0)
+		rCoord.x = getInitHiCoord().x;
+	else if (pCoord.x == 1)
+		rCoord.x = getInitHiCoord().x + 5;
+	else if (pCoord.x == 2)
+		rCoord.x = getInitHiCoord().x + 5 + 12;				// SPLIT IN TWO PARTS TO MAKE OBVIOUS THAT I AM MOVING FORWARD IN TWO PARTS
 	return rCoord;
 }
 
