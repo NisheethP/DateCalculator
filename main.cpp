@@ -1,6 +1,7 @@
 #include "Table.h"
 #include "Date.h"
 #include <iostream>
+#include <conio.h>
 
 using TableSpace::Table;
 typedef boost::gregorian::date bDate;
@@ -64,6 +65,75 @@ int main()
 
 	TableSpace::delight(Date1_Yesterday.getInitCoord(), 25, TableSpace::Gray);
 	TableSpace::delight(Date1_Morrow.getInitCoord(), 25, TableSpace::Gray);
+	
+	TableSpace::hilight(Date1.getInitHiCoord(), 2);
+		
+	bool isLoopGoing = true;
+	do
+	{
+		int hiLength = 0;
+		std::string tempString;
+		MonthToStr(Date1.getDate(0).getMonth(), tempString);
+		
+		switch (Date1.HiToAbs(Date1.getHiCoord()).x)
+		{
+		case 0:
+			hiLength = 2;
+			break;
+		case 1:
+			hiLength = tempString.length();
+			break;
+		case 2:
+			hiLength = 4;
+			break;
+		}
+		Date1_Yesterday.drawTable();
+		Date1.drawTable();
+		Date1_Morrow.drawTable();
+
+		TableSpace::delight(Date1.getHiCoord(), 25);
+		TableSpace::hilight(Date1.getHiCoord(), hiLength);
+
+		char userInp = _getch();
+		/*
+		 *This do-While Loop is to take input from the user dynamically.
+		 *I use _getch to get unbuffered input (WINDOWS only funciton) from the user.
+		 *After getting the input, it will check if it is one of the W-S-A-D keys and
+		 *treat them as ARROW keys in same arrangement. The cases will check if the HILIGHT
+		 *is not already at the edge, and if not, move it in that direction
+		 *The Table::hiCoord needs to be adjusted for each case.
+		 * char(13) is ENTER KEY
+		 */
+		switch (userInp)
+		{
+		case 'd':
+			if (Date1.HiToAbs(Date1.getHiCoord()).x != Date1.AbsToHi({ 3, 0 }).x)
+			{
+				Table::Coord newCoord = { 0, 0 };
+				newCoord = Date1.HiToAbs({Date1.getHiCoord().x, Date1.getHiCoord().y});
+				newCoord.x += 1;
+				Date1.setHiCoord(Date1.AbsToHi(newCoord));
+			}
+			break;
+
+		case 'a':
+			break;
+
+		case 'w':
+			break;
+
+		case 's':
+			break;
+
+		case 13:
+			isLoopGoing = false;
+			break;
+
+		default:
+			break;
+		}
+
+	} while (isLoopGoing);
 
 	std::cin.get();
 	return 0;
