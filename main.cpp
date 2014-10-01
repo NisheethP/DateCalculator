@@ -9,15 +9,15 @@ typedef boost::gregorian::date bDate;
 // FUNCTIONS DECLERATION
 //==============================
 
-void ReduceDate(bDate &pDate, bDate pCurDate);
-void ReduceMonth(bDate &pDate, bDate pCurDate);
-void ReduceYear(bDate &pDate);
-void ReduceAllDate(bDate &pDate, bDate pCurDate);
+void ReduceDate(Date &pDate, bDate pCurDate);
+void ReduceMonth(Date &pDate, bDate pCurDate);
+void ReduceYear(Date &pDate);
+void ReduceAllDate(Date &pDate, bDate pCurDate);
 
-void IncreaseDate(bDate &pDate, bDate pCurDate);
-void IncreaseMonth(bDate &pDate, bDate pCurDate);
-void IncreaseYear(bDate &pDate);
-void IncreaseAllDate(bDate &pDate, bDate pCurDate);
+void IncreaseDate(Date &pDate, bDate pCurDate);
+void IncreaseMonth(Date &pDate, bDate pCurDate);
+void IncreaseYear(Date &pDate);
+void IncreaseAllDate(Date &pDate, bDate pCurDate);
 
 //==============================
 // MAIN FUNCTION
@@ -39,8 +39,6 @@ int main()
 	Table Date1				(1, { 7, 5 }, { 7, 2 });
 	Table Date1_Morrow		(1, { 7, 6 }, { 7, 2 });
 	
-	boost::gregorian::date date1_Yesterday, date1_Morrow;
-
 	/*
 	 *This will make date1_Yesterday one day, one month and one year before today.
 	 *Similarly for the second one which will go ahead instead.
@@ -50,15 +48,9 @@ int main()
 	 *should be adjusted simultaneously.
 	 */
 	
-	date1_Yesterday = Date1_Yesterday.getDate(0).toDate();
-	date1_Morrow = Date1_Morrow.getDate(0).toDate();
-
-	ReduceAllDate(date1_Yesterday, Date1.getDate(0).toDate());
-	IncreaseAllDate(date1_Morrow, Date1.getDate(0).toDate());
+	ReduceAllDate(Date1_Yesterday.getDate(0), Date1.getDate(0).toDate());
+	IncreaseAllDate(Date1_Morrow.getDate(0), Date1.getDate(0).toDate());
 	
-	Date1_Yesterday.setDate(date1_Yesterday,0);
-	Date1_Morrow.setDate(date1_Morrow,0);
-
 	Date1_Yesterday.drawTable();
 	Date1.drawTable();
 	Date1_Morrow.drawTable();
@@ -145,31 +137,32 @@ int main()
 
 //THE FUNCTIONS TO REDUCE FROM DATE
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ReduceDate(bDate &pDate, bDate pCurDate)
+void ReduceDate(Date &pDate, bDate pCurDate)
 {
 	int maxCurDate = pCurDate.end_of_month().day();
-	if (pDate.day() == 1)
+	if (pDate.getDate() == 1)
 	{
-		pDate = Date(maxCurDate, (Month)pDate.month().as_enum(), pDate.year()).toDate();
+		pDate = Date(maxCurDate, (Month)(pDate.getMonth()), pDate.getYear());
 	}
 	else
-		pDate = Date(pDate.day() - 1, (Month)pDate.month().as_enum(), pDate.year()).toDate();
+		pDate = Date(pDate.getDate() - 1, (pDate.getMonth()), pDate.getYear());
 }
-void ReduceMonth(bDate &pDate, bDate pCurDate)
+void ReduceMonth(Date &pDate, bDate pCurDate)
 {
-	if (pDate.month().as_enum() == Month::January)
+	Date t_Date;
+	if (pDate.getMonth() == Month::January)
 	{
-		pDate = Date(pDate.day(), Month::December, pDate.year()).toDate();
+		t_Date = Date(pDate.getDate(), Month::December, pDate.getYear());
 	}
 	else
-		pDate = Date(pDate.day(), (Month)(pDate.month().as_enum() - 1), pDate.year()).toDate();
+		t_Date = Date(pDate.getDate(), (Month)(pDate.getMonth() - 1), pDate.getYear());
 
 }
-void ReduceYear(bDate &pDate)
+void ReduceYear(Date &pDate)
 {
-	pDate -= boost::gregorian::years(1);
+	pDate.setYear(pDate.getYear() -1);
 }
-void ReduceAllDate(bDate &pDate, bDate pCurDate)
+void ReduceAllDate(Date &pDate, bDate pCurDate)
 {
 	ReduceDate(pDate, pCurDate);
 	ReduceMonth(pDate, pCurDate);
@@ -178,32 +171,32 @@ void ReduceAllDate(bDate &pDate, bDate pCurDate)
 
 //INCREASE THE DATE
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void IncreaseDate(bDate &pDate, bDate pCurDate)
+void IncreaseDate(Date &pDate, bDate pCurDate)
 {
 	int maxCurDate = pCurDate.end_of_month().day();
-	if (pDate.day() == maxCurDate)
+	if (pDate.getDate() == maxCurDate)
 	{
-		pDate = Date(1, (Month)pDate.month().as_enum(), pDate.year()).toDate();
+		pDate = Date(1, pDate.getMonth(), pDate.getYear());
 		ReduceMonth(pDate, pCurDate);
 	}
 	else
-		pDate = Date(pDate.day() + 1, (Month)pDate.month().as_enum(), pDate.year()).toDate();
+		pDate = Date(pDate.getDate() + 1, pDate.getMonth(), pDate.getYear()).toDate();
 
 }
-void IncreaseMonth(bDate &pDate, bDate pCurDate)
+void IncreaseMonth(Date &pDate, bDate pCurDate)
 {
-	if ((Month)pDate.month().as_enum() == Month::December)
+	if (pDate.getMonth() == Month::December)
 	{
-		pDate = Date(pDate.day(), Month::January, pDate.year()).toDate();
+		pDate = Date(pDate.getDate(), Month::January, pDate.getYear());
 	}
 	else
-		pDate = Date(pDate.day(), (Month)(pDate.month().as_enum() + 1), pDate.year()).toDate();
+		pDate = Date(pDate.getDate(), (Month)(pDate.getMonth() + 1), pDate.getYear());
 }
-void IncreaseYear(bDate &pDate)
+void IncreaseYear(Date &pDate)
 {
-	pDate += boost::gregorian::years(1);
+	pDate.setYear(pDate.getYear() + 1);
 }
-void IncreaseAllDate(bDate &pDate, bDate pCurDate)
+void IncreaseAllDate(Date &pDate, bDate pCurDate)
 {
 	IncreaseDate(pDate, pCurDate);
 	IncreaseMonth(pDate, pCurDate);
