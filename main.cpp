@@ -47,9 +47,14 @@ int main()
 	 *When in the input handling loop, The date in Date1, Date1_Yesterday and Date1_Morrow
 	 *should be adjusted simultaneously.
 	 */
+	Date tempDate = Date1_Yesterday.getDate(0);
+	ReduceAllDate(tempDate, Date1.getDate(0).toDate());
+	ReduceDate(tempDate, Date1.getDate(0).toDate());
+	Date1_Yesterday.setDate(tempDate, 0);
 	
-	ReduceAllDate(Date1_Yesterday.getDate(0), Date1.getDate(0).toDate());
-	IncreaseAllDate(Date1_Morrow.getDate(0), Date1.getDate(0).toDate());
+	tempDate = Date1_Morrow.getDate(0);
+	IncreaseAllDate(tempDate, Date1.getDate(0).toDate());
+	Date1_Morrow.setDate(tempDate, 0);
 	
 	Date1_Yesterday.drawTable();
 	Date1.drawTable();
@@ -142,20 +147,19 @@ void ReduceDate(Date &pDate, bDate pCurDate)
 	int maxCurDate = pCurDate.end_of_month().day();
 	if (pDate.getDate() == 1)
 	{
-		pDate = Date(maxCurDate, (Month)(pDate.getMonth()), pDate.getYear());
+		pDate.setDate(maxCurDate);
 	}
 	else
-		pDate = Date(pDate.getDate() - 1, (pDate.getMonth()), pDate.getYear());
+		pDate.setDate(pDate.getDate() - 1);
 }
 void ReduceMonth(Date &pDate, bDate pCurDate)
 {
-	Date t_Date;
 	if (pDate.getMonth() == Month::January)
 	{
-		t_Date = Date(pDate.getDate(), Month::December, pDate.getYear());
+		pDate.setMonth(Month::December);
 	}
 	else
-		t_Date = Date(pDate.getDate(), (Month)(pDate.getMonth() - 1), pDate.getYear());
+		pDate.setMonth((Month)(pDate.getMonth()-1));
 
 }
 void ReduceYear(Date &pDate)
@@ -176,21 +180,20 @@ void IncreaseDate(Date &pDate, bDate pCurDate)
 	int maxCurDate = pCurDate.end_of_month().day();
 	if (pDate.getDate() == maxCurDate)
 	{
-		pDate = Date(1, pDate.getMonth(), pDate.getYear());
-		ReduceMonth(pDate, pCurDate);
+		pDate.setDate(1);
 	}
 	else
-		pDate = Date(pDate.getDate() + 1, pDate.getMonth(), pDate.getYear()).toDate();
+		pDate.setDate(pDate.getDate() + 1);
 
 }
 void IncreaseMonth(Date &pDate, bDate pCurDate)
 {
 	if (pDate.getMonth() == Month::December)
 	{
-		pDate = Date(pDate.getDate(), Month::January, pDate.getYear());
+		pDate.setMonth(Month::January);
 	}
 	else
-		pDate = Date(pDate.getDate(), (Month)(pDate.getMonth() + 1), pDate.getYear());
+		pDate.setMonth((Month)(pDate.getMonth() + 1));
 }
 void IncreaseYear(Date &pDate)
 {
