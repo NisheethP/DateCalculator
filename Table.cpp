@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <boost\date_time\gregorian\gregorian.hpp>
 #include <string>
-#include <sstream>
+#include <boost\lexical_cast.hpp>
 
 using TableSpace::Table;
 using TableSpace::Global;
@@ -92,7 +92,7 @@ void Table::setDate(Date pDate, int pRow)
 		tableData[pRow] = pDate;
 	}
 	else
-		throw Exceptions::TableRowOutOfBound(row, pRow);
+		tableData[row] = pDate;
 }
 
 //==============================
@@ -125,10 +125,10 @@ Table::Coord Table::getInitHiCoord()
 }
 Date Table::getDate(int pRow)
 {
-	if (pRow >= row)
-		throw Exceptions::TableRowOutOfBound(row, pRow);
-
-	return tableData[pRow];
+	if (pRow < row && pRow >= 0)
+		return tableData[pRow];
+	else
+		return tableData[row];
 }
 
 //=================================
@@ -215,31 +215,40 @@ void Table::drawTable()
 
 	int rowDataIter = 0;
 	int colDataIter = 0;
-
 	for (int rowIter = 0; rowIter < (row * deltaCoord->y) - 1; ++rowIter)
 	{
-		for (int colIter = 0; colIter < 2*column - 1 ; ++colIter)
+		for (int colIter = 0; colIter < 2 * column - 1; ++colIter)
 		{
 			curCoord = { initCoord->x + 2 * (deltaCoord->x*colIter), initCoord->y + deltaCoord->y*rowIter + 2 };
-
-			boost::gregorian::date tempDate = tableData[rowDataIter].toDate();
+			boost::gregorian::date tempDate;
+			
+			tempDate = tableData[rowDataIter].toDate();
+			
 			std::string dateStr = boost::gregorian::to_iso_extended_string(tempDate);
 
 			std::string dateYear, dateMonth, dateDate;
 			dateYear = dateMonth = dateDate = "";
-			
-			for (int i = 0; i < 4; ++i)
-				dateYear += dateStr[i];					
 
-			for (int i = 8; i < 10; ++i)
-				dateDate += dateStr[i];
+			for (int i = 0; i < 4; ++i)
+				dateYear += dateStr[i];
+
+			if (tempDate.day() != tableData[rowDataIter].getDate())
+			{
+				dateDate = boost::lexical_cast<std::string> (tableData[rowDataIter].getDate());
+			}
+			
+			else
+			{
+				for (int i = 8; i < 10; ++i)
+					dateDate += dateStr[i];
+			}
 
 			const int MonthCoord = (initCoord->x + 5);
 			const int YearCoord = (initCoord->x + 5) + 12;
 
-			MonthToStr(tableData[rowDataIter].getMonth(),dateMonth);
+			MonthToStr(tableData[rowDataIter].getMonth(), dateMonth);
 
-			if (colIter%2 != 0)
+			if (colIter % 2 != 0)
 			{
 				if (colIter == 1)
 					curCoord.x = initCoord->x + 3;
@@ -273,9 +282,9 @@ void Table::drawTable()
 
 				if (colDataIter < column)
 					++colDataIter;
-			}		
+			}
 		}
-		if (rowDataIter < row-1)
+		if (rowDataIter < row - 1)
 			++rowDataIter;
 	}
 }

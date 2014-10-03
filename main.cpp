@@ -49,7 +49,6 @@ int main()
 	 */
 	Date tempDate = Date1_Yesterday.getDate(0);
 	ReduceAllDate(tempDate, Date1.getDate(0).toDate());
-	ReduceDate(tempDate, Date1.getDate(0).toDate());
 	Date1_Yesterday.setDate(tempDate, 0);
 	
 	tempDate = Date1_Morrow.getDate(0);

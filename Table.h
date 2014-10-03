@@ -140,25 +140,4 @@ namespace TableSpace
 	void hilight(Table::Coord crd, int length, Colour fore = Colour::DarkBlue, Colour back = Colour::White);
 	void delight(Table::Coord crd, int length, Colour fore = Colour::White, Colour back = Colour::None);
 }
-
-namespace Exceptions
-{
-	class Codes
-	{
-
-	};
-
-	class TableRowOutOfBound : public Codes
-	{
-		int maxRows;
-		int rowParam;
-	public:
-		TableRowOutOfBound(int pMaxRow, int pRowParam)
-		{
-			maxRows = pMaxRow;
-			rowParam = pRowParam;
-		}
-	};
-}
-
 #endif
