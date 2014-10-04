@@ -5,19 +5,22 @@
 
 using TableSpace::Table;
 typedef boost::gregorian::date bDate;
+
+const unsigned short MIN_YEAR = 1400;
+const unsigned short MAX_YEAR = 10000;
 //==============================
 // FUNCTIONS DECLERATION
 //==============================
 
-void ReduceDate(Date &pDate, bDate pCurDate);
-void ReduceMonth(Date &pDate, bDate pCurDate);
+void ReduceDate(Date &pDate);
+void ReduceMonth(Date &pDate);
 void ReduceYear(Date &pDate);
-void ReduceAllDate(Date &pDate, bDate pCurDate);
+void ReduceAllDate(Date &pDate);
 
-void IncreaseDate(Date &pDate, bDate pCurDate);
-void IncreaseMonth(Date &pDate, bDate pCurDate);
+void IncreaseDate(Date &pDate);
+void IncreaseMonth(Date &pDate);
 void IncreaseYear(Date &pDate);
-void IncreaseAllDate(Date &pDate, bDate pCurDate);
+void IncreaseAllDate(Date &pDate);
 
 //==============================
 // MAIN FUNCTION
@@ -48,11 +51,12 @@ int main()
 	 *should be adjusted simultaneously.
 	 */
 	Date tempDate = Date1_Yesterday.getDate(0);
-	ReduceAllDate(tempDate, Date1.getDate(0).toDate());
+	ReduceAllDate(tempDate);
 	Date1_Yesterday.setDate(tempDate, 0);
 	
 	tempDate = Date1_Morrow.getDate(0);
-	IncreaseAllDate(tempDate, Date1.getDate(0).toDate());
+	IncreaseAllDate(tempDate);
+
 	Date1_Morrow.setDate(tempDate, 0);
 	
 	Date1_Yesterday.drawTable();
@@ -90,6 +94,9 @@ int main()
 		TableSpace::delight(Date1.getHiCoord(), 25);
 		TableSpace::hilight(Date1.getHiCoord(), hiLength);
 
+		TableSpace::delight(Date1_Yesterday.getInitCoord(), 25, TableSpace::Gray);
+		TableSpace::delight(Date1_Morrow.getInitCoord(), 25, TableSpace::Gray);
+
 		char userInp = _getch();
 		/*
 		 *This do-While Loop is to take input from the user dynamically.
@@ -123,9 +130,109 @@ int main()
 			break;
 
 		case 'w':
+			if (Date1.HiToAbs(Date1.getHiCoord()).x == 0)
+			{
+				Date tempDate = Date1.getDate(0);
+				
+				tempDate = Date1.getDate(0);
+				ReduceDate(tempDate);
+				Date1.setDate(tempDate,0);
+
+				tempDate = Date1_Yesterday.getDate(0);
+				ReduceDate(tempDate);
+				Date1_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date1_Morrow.getDate(0);
+				ReduceDate(tempDate);
+				Date1_Morrow.setDate(tempDate, 0);
+
+			}
+
+			if (Date1.HiToAbs(Date1.getHiCoord()).x == 1)
+			{
+				Date tempDate = Date1.getDate(0);
+				ReduceMonth(tempDate);
+				Date1.setDate(tempDate, 0);
+
+				tempDate = Date1_Yesterday.getDate(0);
+				ReduceMonth(tempDate);
+				Date1_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date1_Morrow.getDate(0);
+				ReduceMonth(tempDate);
+				Date1_Morrow.setDate(tempDate, 0);
+			}
+
+			if (Date1.HiToAbs(Date1.getHiCoord()).x == 2)
+			{
+				Date tempDate = Date1_Yesterday.getDate(0);
+				if (Date1_Yesterday.getDate(0).getYear() > MIN_YEAR)
+					ReduceYear(tempDate);
+				Date1_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date1.getDate(0);
+				if (Date1.getDate(0).getYear() > MIN_YEAR + 1)
+					ReduceYear(tempDate);
+				Date1.setDate(tempDate, 0);
+
+				tempDate = Date1_Morrow.getDate(0);
+				if (Date1_Morrow.getDate(0).getYear() > MIN_YEAR + 2)
+					ReduceYear(tempDate);
+				Date1_Morrow.setDate(tempDate, 0);
+			}
 			break;
 
 		case 's':
+			if (Date1.HiToAbs(Date1.getHiCoord()).x == 0)
+			{
+				Date tempDate = Date1.getDate(0);
+
+				tempDate = Date1.getDate(0);
+				IncreaseDate(tempDate);
+				Date1.setDate(tempDate, 0);
+
+				tempDate = Date1_Yesterday.getDate(0);
+				IncreaseDate(tempDate);
+				Date1_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date1_Morrow.getDate(0);
+				IncreaseDate(tempDate);
+				Date1_Morrow.setDate(tempDate, 0);
+
+			}
+
+			if (Date1.HiToAbs(Date1.getHiCoord()).x == 1)
+			{
+				Date tempDate = Date1.getDate(0);
+				IncreaseMonth(tempDate);
+				Date1.setDate(tempDate, 0);
+
+				tempDate = Date1_Yesterday.getDate(0);
+				IncreaseMonth(tempDate);
+				Date1_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date1_Morrow.getDate(0);
+				IncreaseMonth(tempDate);
+				Date1_Morrow.setDate(tempDate, 0);
+			}
+
+			if (Date1.HiToAbs(Date1.getHiCoord()).x == 2)
+			{
+				Date tempDate = Date1_Yesterday.getDate(0);
+				if (Date1_Yesterday.getDate(0).getYear() < MAX_YEAR - 2)
+					IncreaseYear(tempDate);
+				Date1_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date1.getDate(0);
+				if (Date1.getDate(0).getYear() < MAX_YEAR - 1)
+					IncreaseYear(tempDate);
+				Date1.setDate(tempDate, 0);
+
+				tempDate = Date1_Morrow.getDate(0);
+				if (Date1_Morrow.getDate(0).getYear() < MAX_YEAR)
+					IncreaseYear(tempDate);
+				Date1_Morrow.setDate(tempDate, 0);
+			}
 			break;
 
 		case 13:
@@ -138,7 +245,6 @@ int main()
 
 	} while (isLoopGoing);
 
-	std::cin.get();
 	return 0;
 }
 
@@ -148,17 +254,16 @@ int main()
 
 //THE FUNCTIONS TO REDUCE FROM DATE
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ReduceDate(Date &pDate, bDate pCurDate)
+void ReduceDate(Date &pDate)
 {
-	int maxCurDate = pCurDate.end_of_month().day();
 	if (pDate.getDate() == 1)
 	{
-		pDate.setDate(maxCurDate);
+		pDate.setDate(31);
 	}
 	else
 		pDate.setDate(pDate.getDate() - 1);
 }
-void ReduceMonth(Date &pDate, bDate pCurDate)
+void ReduceMonth(Date &pDate)
 {
 	if (pDate.getMonth() == Month::January)
 	{
@@ -172,19 +277,18 @@ void ReduceYear(Date &pDate)
 {
 	pDate.setYear(pDate.getYear() -1);
 }
-void ReduceAllDate(Date &pDate, bDate pCurDate)
+void ReduceAllDate(Date &pDate)
 {
-	ReduceDate(pDate, pCurDate);
-	ReduceMonth(pDate, pCurDate);
+	ReduceDate(pDate);
+	ReduceMonth(pDate);
 	ReduceYear(pDate);
 }
 
 //INCREASE THE DATE
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void IncreaseDate(Date &pDate, bDate pCurDate)
+void IncreaseDate(Date &pDate)
 {
-	int maxCurDate = pCurDate.end_of_month().day();
-	if (pDate.getDate() == maxCurDate)
+	if (pDate.getDate() == 31)
 	{
 		pDate.setDate(1);
 	}
@@ -192,7 +296,7 @@ void IncreaseDate(Date &pDate, bDate pCurDate)
 		pDate.setDate(pDate.getDate() + 1);
 
 }
-void IncreaseMonth(Date &pDate, bDate pCurDate)
+void IncreaseMonth(Date &pDate)
 {
 	if (pDate.getMonth() == Month::December)
 	{
@@ -205,9 +309,9 @@ void IncreaseYear(Date &pDate)
 {
 	pDate.setYear(pDate.getYear() + 1);
 }
-void IncreaseAllDate(Date &pDate, bDate pCurDate)
+void IncreaseAllDate(Date &pDate)
 {
-	IncreaseDate(pDate, pCurDate);
-	IncreaseMonth(pDate, pCurDate);
+	IncreaseDate(pDate);
+	IncreaseMonth(pDate);
 	IncreaseYear(pDate);
 }
