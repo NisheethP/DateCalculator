@@ -103,16 +103,23 @@ int main()
 		switch (userInp)
 		{
 		case 'd':
-			if (Date1.HiToAbs(Date1.getHiCoord()).x != Date1.AbsToHi({ 3, 0 }).x)
+			if (Date1.getHiCoord().x != Date1.AbsToHi({ 2, 0 }).x)
 			{
 				Table::Coord newCoord = { 0, 0 };
-				newCoord = Date1.HiToAbs({Date1.getHiCoord().x, Date1.getHiCoord().y});
+				newCoord = Date1.HiToAbs(Date1.getHiCoord());
 				newCoord.x += 1;
 				Date1.setHiCoord(Date1.AbsToHi(newCoord));
 			}
 			break;
 
 		case 'a':
+			if (Date1.getHiCoord().x != Date1.AbsToHi({ 0, 0 }).x)
+			{
+				Table::Coord newCoord = { 0, 0 };
+				newCoord = Date1.HiToAbs(Date1.getHiCoord());
+				newCoord.x -= 1;
+				Date1.setHiCoord(Date1.AbsToHi(newCoord));
+			}
 			break;
 
 		case 'w':
