@@ -38,9 +38,13 @@ int main()
 	 *will just change the 3 dates themselves to seem as if it moved in a dial.
 	 */
 	 
-	Table Date1_Yesterday	(1, { 7, 4 }, { 7, 2 });
-	Table Date1				(1, { 7, 5 }, { 7, 2 });
-	Table Date1_Morrow		(1, { 7, 6 }, { 7, 2 });
+	Table Date1_Yesterday	(1, { 18, 13 }, { 7, 2 });
+	Table Date1				(1, { 18, 14 }, { 7, 2 });
+	Table Date1_Morrow		(1, { 18, 15 }, { 7, 2 });
+
+	Table Date2_Yesterday(1, { 18, 13 }, { 7, 2 });
+	Table Date2(1, { 18, 14 }, { 7, 2 });
+	Table Date2_Morrow(1, { 18, 15 }, { 7, 2 });
 	
 	/*
 	 *This will make date1_Yesterday one day, one month and one year before today.
@@ -56,8 +60,15 @@ int main()
 	
 	tempDate = Date1_Morrow.getDate(0);
 	IncreaseAllDate(tempDate);
-
 	Date1_Morrow.setDate(tempDate, 0);
+
+	tempDate = Date2_Yesterday.getDate(0);
+	ReduceAllDate(tempDate);
+	Date2_Yesterday.setDate(tempDate, 0);
+
+	tempDate = Date2_Morrow.getDate(0);
+	IncreaseAllDate(tempDate);
+	Date2_Morrow.setDate(tempDate, 0);
 	
 	Date1_Yesterday.drawTable();
 	Date1.drawTable();
@@ -132,7 +143,7 @@ int main()
 		case 'w':
 			if (Date1.HiToAbs(Date1.getHiCoord()).x == 0)
 			{
-				Date tempDate = Date1.getDate(0);
+				tempDate = Date1.getDate(0);
 				
 				tempDate = Date1.getDate(0);
 				ReduceDate(tempDate);
@@ -150,7 +161,7 @@ int main()
 
 			if (Date1.HiToAbs(Date1.getHiCoord()).x == 1)
 			{
-				Date tempDate = Date1.getDate(0);
+				tempDate = Date1.getDate(0);
 				ReduceMonth(tempDate);
 				Date1.setDate(tempDate, 0);
 
@@ -165,7 +176,7 @@ int main()
 
 			if (Date1.HiToAbs(Date1.getHiCoord()).x == 2)
 			{
-				Date tempDate = Date1_Yesterday.getDate(0);
+				tempDate = Date1_Yesterday.getDate(0);
 				if (Date1_Yesterday.getDate(0).getYear() > MIN_YEAR)
 					ReduceYear(tempDate);
 				Date1_Yesterday.setDate(tempDate, 0);
@@ -185,7 +196,7 @@ int main()
 		case 's':
 			if (Date1.HiToAbs(Date1.getHiCoord()).x == 0)
 			{
-				Date tempDate = Date1.getDate(0);
+				tempDate = Date1.getDate(0);
 
 				tempDate = Date1.getDate(0);
 				IncreaseDate(tempDate);
@@ -203,7 +214,7 @@ int main()
 
 			if (Date1.HiToAbs(Date1.getHiCoord()).x == 1)
 			{
-				Date tempDate = Date1.getDate(0);
+				tempDate = Date1.getDate(0);
 				IncreaseMonth(tempDate);
 				Date1.setDate(tempDate, 0);
 
@@ -218,7 +229,7 @@ int main()
 
 			if (Date1.HiToAbs(Date1.getHiCoord()).x == 2)
 			{
-				Date tempDate = Date1_Yesterday.getDate(0);
+				tempDate = Date1_Yesterday.getDate(0);
 				if (Date1_Yesterday.getDate(0).getYear() < MAX_YEAR - 2)
 					IncreaseYear(tempDate);
 				Date1_Yesterday.setDate(tempDate, 0);
@@ -232,6 +243,182 @@ int main()
 				if (Date1_Morrow.getDate(0).getYear() < MAX_YEAR)
 					IncreaseYear(tempDate);
 				Date1_Morrow.setDate(tempDate, 0);
+			}
+			break;
+
+		case 13:
+			isLoopGoing = false;
+			break;
+
+		default:
+			break;
+		}
+
+	} while (isLoopGoing);
+
+	isLoopGoing = true;
+
+	/*
+	 *This is a copy pasteof the first loop. The only difference is that it eddles with date 2 only.
+	 *A better way would be to make a function that takes the main date as a parameter. Copies it to
+	 *a temporary holder, works on that temporary one, and finally copies back to the parameter. Would be
+	 *more readable and efficient
+	 */
+	do
+	{
+		int hiLength = 0;
+		std::string tempString;
+		MonthToStr(Date2.getDate(0).getMonth(), tempString);
+
+		switch (Date2.HiToAbs(Date2.getHiCoord()).x)
+		{
+		case 0:
+			hiLength = 2;
+			break;
+		case 1:
+			hiLength = tempString.length();
+			break;
+		case 2:
+			hiLength = 4;
+			break;
+		}
+		Date2_Yesterday.drawTable();
+		Date2.drawTable();
+		Date2_Morrow.drawTable();
+
+		TableSpace::delight(Date2.getHiCoord(), 25);
+		TableSpace::hilight(Date2.getHiCoord(), hiLength);
+
+		TableSpace::delight(Date2_Yesterday.getInitCoord(), 25, TableSpace::Gray);
+		TableSpace::delight(Date2_Morrow.getInitCoord(), 25, TableSpace::Gray);
+
+		char userInp = _getch();
+
+		switch (userInp)
+		{
+		case 'd':
+			if (Date2.getHiCoord().x != Date2.AbsToHi({ 2, 0 }).x)
+			{
+				Table::Coord newCoord = { 0, 0 };
+				newCoord = Date2.HiToAbs(Date2.getHiCoord());
+				newCoord.x += 1;
+				Date2.setHiCoord(Date2.AbsToHi(newCoord));
+			}
+			break;
+
+		case 'a':
+			if (Date2.getHiCoord().x != Date2.AbsToHi({ 0, 0 }).x)
+			{
+				Table::Coord newCoord = { 0, 0 };
+				newCoord = Date2.HiToAbs(Date2.getHiCoord());
+				newCoord.x -= 1;
+				Date2.setHiCoord(Date2.AbsToHi(newCoord));
+			}
+			break;
+
+		case 'w':
+			if (Date2.HiToAbs(Date2.getHiCoord()).x == 0)
+			{
+				Date tempDate = Date2.getDate(0);
+
+				tempDate = Date2.getDate(0);
+				ReduceDate(tempDate);
+				Date2.setDate(tempDate, 0);
+
+				tempDate = Date2_Yesterday.getDate(0);
+				ReduceDate(tempDate);
+				Date2_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date2_Morrow.getDate(0);
+				ReduceDate(tempDate);
+				Date2_Morrow.setDate(tempDate, 0);
+
+			}
+
+			if (Date2.HiToAbs(Date2.getHiCoord()).x == 1)
+			{
+				Date tempDate = Date2.getDate(0);
+				ReduceMonth(tempDate);
+				Date2.setDate(tempDate, 0);
+
+				tempDate = Date2_Yesterday.getDate(0);
+				ReduceMonth(tempDate);
+				Date2_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date2_Morrow.getDate(0);
+				ReduceMonth(tempDate);
+				Date2_Morrow.setDate(tempDate, 0);
+			}
+
+			if (Date2.HiToAbs(Date2.getHiCoord()).x == 2)
+			{
+				Date tempDate = Date2_Yesterday.getDate(0);
+				if (Date2_Yesterday.getDate(0).getYear() > MIN_YEAR)
+					ReduceYear(tempDate);
+				Date2_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date2.getDate(0);
+				if (Date2.getDate(0).getYear() > MIN_YEAR + 1)
+					ReduceYear(tempDate);
+				Date2.setDate(tempDate, 0);
+
+				tempDate = Date2_Morrow.getDate(0);
+				if (Date2_Morrow.getDate(0).getYear() > MIN_YEAR + 2)
+					ReduceYear(tempDate);
+				Date2_Morrow.setDate(tempDate, 0);
+			}
+			break;
+
+		case 's':
+			if (Date2.HiToAbs(Date2.getHiCoord()).x == 0)
+			{
+				Date tempDate = Date2.getDate(0);
+
+				tempDate = Date2.getDate(0);
+				IncreaseDate(tempDate);
+				Date2.setDate(tempDate, 0);
+
+				tempDate = Date2_Yesterday.getDate(0);
+				IncreaseDate(tempDate);
+				Date2_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date2_Morrow.getDate(0);
+				IncreaseDate(tempDate);
+				Date2_Morrow.setDate(tempDate, 0);
+
+			}
+
+			if (Date2.HiToAbs(Date2.getHiCoord()).x == 1)
+			{
+				Date tempDate = Date2.getDate(0);
+				IncreaseMonth(tempDate);
+				Date2.setDate(tempDate, 0);
+
+				tempDate = Date2_Yesterday.getDate(0);
+				IncreaseMonth(tempDate);
+				Date2_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date2_Morrow.getDate(0);
+				IncreaseMonth(tempDate);
+				Date2_Morrow.setDate(tempDate, 0);
+			}
+
+			if (Date2.HiToAbs(Date2.getHiCoord()).x == 2)
+			{
+				Date tempDate = Date2_Yesterday.getDate(0);
+				if (Date2_Yesterday.getDate(0).getYear() < MAX_YEAR - 2)
+					IncreaseYear(tempDate);
+				Date2_Yesterday.setDate(tempDate, 0);
+
+				tempDate = Date2.getDate(0);
+				if (Date2.getDate(0).getYear() < MAX_YEAR - 1)
+					IncreaseYear(tempDate);
+				Date2.setDate(tempDate, 0);
+
+				tempDate = Date2_Morrow.getDate(0);
+				if (Date2_Morrow.getDate(0).getYear() < MAX_YEAR)
+					IncreaseYear(tempDate);
+				Date2_Morrow.setDate(tempDate, 0);
 			}
 			break;
 
