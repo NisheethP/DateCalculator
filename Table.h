@@ -67,8 +67,6 @@ namespace TableSpace
 		Coord *hiCoord;
 		Coord *deltaCoord;
 
-		Coord static ConvCoord(Coord);
-
 		void gotoxy(int column = wherex(), int line = wherey());
 		int static wherex();
 		int static wherey();
@@ -77,6 +75,7 @@ namespace TableSpace
 	public:
 		Table();
 		Table(int pRow, Coord pInitCoord, Coord pDeltaCoord);
+		Table(Table&);
 
 		class Coord
 		{
@@ -122,6 +121,7 @@ namespace TableSpace
 		Coord getHiCoord();
 		Coord getInitHiCoord();
 		Date getDate(int pRow);
+		DateVector getTable();
 
 		void drawTable();
 
