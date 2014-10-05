@@ -2,6 +2,7 @@
 #include "Date.h"
 #include <iostream>
 #include <conio.h>
+#include <cmath>
 
 using TableSpace::Table;
 typedef boost::gregorian::date bDate;
@@ -23,6 +24,7 @@ void IncreaseYear(Date &pDate);
 void IncreaseAllDate(Date &pDate);
 
 Date TakeInp(Table& pDate);
+int numDigits(long int);
 //==============================
 // MAIN FUNCTION
 //==============================
@@ -37,14 +39,39 @@ int main()
 	
 	Date tempDate;
 	
+	Date1.gotoxy(Date1.getInitCoord().x, Date1.getInitCoord().y - 3);
+	cout <<"Enter first Date: ";
 	tempDate = TakeInp(Date1);
 	Date1.setDate(tempDate, 0);
 	
+	Date2.gotoxy(Date2.getInitCoord().x, Date2.getInitCoord().y - 3);
+	cout << "Enter Second Date: ";
 	tempDate = TakeInp(Date2);
 	Date2.setDate(tempDate, 0);
 
+	int days = Date1.getDate(0) - Date2.getDate(0);
+	Date1.gotoxy(0, 0);
+	for (int i = 0; i < 80 * 16; ++i)
+		cout << " ";
 
-	cout << std::endl;
+	Table::Coord curCoord = {10,15};
+	Date1.gotoxy(curCoord.x, curCoord.y);
+	
+	int POS_DAYS = ((days>0) ? days : -days);
+
+	cout << boost::gregorian::to_simple_string(Date2.getDate(0).toDate()) << " is ";
+	TableSpace::hilight(curCoord, 11, TableSpace::Colour::Cyan, TableSpace::Colour::None);
+	curCoord.x += 15;
+
+	cout << POS_DAYS<< " Days";
+	TableSpace::hilight(curCoord, numDigits(POS_DAYS) + ((days>0) ? 7 : 6), TableSpace::Colour::Red, TableSpace::Colour::None);
+	cout << ((days>0)?" Before ": " After ");
+	curCoord.x += ((days > 0) ? 7 : 6) + numDigits(POS_DAYS);
+	
+	cout << boost::gregorian::to_simple_string(Date1.getDate(0).toDate());
+	
+	TableSpace::hilight(curCoord, 11, TableSpace::Colour::Cyan, TableSpace::Colour::None);
+	std::cin.get();
 	return 0;
 }
 
@@ -348,4 +375,12 @@ Date TakeInp(Table& pDate)
 	} while (isLoopGoing);
 
 	return date.getDate(0);
+}
+
+//RETURN NUMBER OF DIGITS IN PARAMETER
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+int numDigits(long int pNum)
+{
+	string s = std::to_string(pNum);
+	return s.length();
 }
