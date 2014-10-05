@@ -49,6 +49,23 @@ Table::Table()
 {
 	Table(1, { 0, 0 }, { 0, 0 });
 }
+Table::Table(Table& table)
+{
+	initCoord = new Coord;
+	hiCoord = new Coord;
+	deltaCoord = new Coord;
+	initHiCoord = new Coord;
+
+	column = table.getCol();
+	row = table.getRow();
+
+	*initCoord = table.getInitCoord();
+	*initHiCoord = table.getInitHiCoord();
+	*hiCoord = table.getHiCoord();
+	*deltaCoord = table.getDeltaCoord();
+
+	tableData = table.getTable();
+}
 Table::~Table()
 {
 	delete initCoord;
@@ -129,6 +146,10 @@ Date Table::getDate(int pRow)
 		return tableData[pRow];
 	else
 		return tableData[row];
+}
+Table::DateVector Table::getTable()
+{
+	return tableData;
 }
 
 //=================================
@@ -270,6 +291,9 @@ void Table::drawTable()
 					break;
 				case 1:
 					curCoord.x = MonthCoord;
+					gotoxy(curCoord.x);
+					for (int i = 0; i < 10; ++i)
+						cout << " ";
 					gotoxy(curCoord.x);
 					cout << dateMonth;
 					break;
