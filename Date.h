@@ -65,7 +65,6 @@ public:
 //OTHER HELPUL FUNCTIONS
 //=============================
 bool MonthToStr(Month pMonth, std::string &monthName);
-bool GetMonth(std::string monthName, Month &month);
 Month ConvMonth(boost::gregorian::greg_month pMonth);
 
 #endif

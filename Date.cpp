@@ -1,4 +1,5 @@
 #include "Date.h"
+#include "Table.h"
 
 using std::string;
 
@@ -73,15 +74,11 @@ Date::ushort Date::getYear()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //CLASS OPERATOR OVERLOADS
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int Date::operator- (Date date)
+int  Date::operator- (Date date)
 {
 	if (month != Error)
 	{
-		boost::gregorian::date DateSec(date.date, date.month, date.year);
-		boost::gregorian::date DateFir(this->date, this->month, this->year);
-
-		boost::gregorian::date_duration DateGap = DateFir - DateSec;
-
+		boost::gregorian::date_duration DateGap = this->toDate() - date.toDate();
 		return DateGap.days();
 	}
 	else
@@ -170,16 +167,28 @@ boost::gregorian::date Date::toDate()
 {
 	boost::gregorian::months_of_year enumMonth = (boost::gregorian::months_of_year)month;
 
-	boost::gregorian::greg_month gMonth(enumMonth);
-	boost::gregorian::greg_day gDay(date);
-	boost::gregorian::greg_year gYear(year);
+	boost::gregorian::date tempDate(1400,enumMonth, 1);
+	int maxDate = tempDate.end_of_month().day();
 
-	boost::gregorian::date tDate(gYear,gMonth,gDay);
+	boost::gregorian::date tDate;
+	if (date > maxDate)
+	{
+		boost::gregorian::greg_month gMonth(enumMonth);
+		boost::gregorian::greg_day gDay(maxDate);
+		boost::gregorian::greg_year gYear(year);
 
-	if (tDate.is_not_a_date())
-		return boost::gregorian::date(-1,-1,-1);
+		tDate = boost::gregorian::date(gYear, gMonth, gDay);
+	}
 	else
-		return tDate;
+	{
+		boost::gregorian::greg_month gMonth(enumMonth);
+		boost::gregorian::greg_day gDay(date);
+		boost::gregorian::greg_year gYear(year);
+
+		tDate = boost::gregorian::date(gYear, gMonth, gDay);
+	}
+	
+	return tDate;
 }
 
 //=============================
@@ -232,40 +241,6 @@ bool MonthToStr(Month pMonth, string &monthName)
 		monthName = "Invalid Month";
 		return false;
 	}
-}
-bool GetMonth(string monthName, Month &month)
-{
-	if (monthName == "Jan")
-		month = January;
-	else if (monthName == "Feb")
-		month = February;
-	else if (monthName == "Mar")
-		month = March;
-	else if (monthName == "Apr")
-		month = April;
-	else if (monthName == "May")
-		month = May;
-	else if (monthName == "Jun")
-		month = June;
-	else if (monthName == "Jul")
-		month = July;
-	else if (monthName == "Aug")
-		month = August;
-	else if (monthName == "Sep")
-		month = September;
-	else if (monthName == "Oct")
-		month = October;
-	else if (monthName == "Nov")
-		month = November;
-	else if (monthName == "Dec")
-		month = December;
-	else
-		month = Error;
-
-	if (month == Error)
-		return false;
-	else
-		return true;
 }
 Month ConvMonth(boost::gregorian::greg_month pMonth)
 {
