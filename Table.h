@@ -67,9 +67,6 @@ namespace TableSpace
 		Coord *hiCoord;
 		Coord *deltaCoord;
 
-		void gotoxy(int column = wherex(), int line = wherey());
-		int static wherex();
-		int static wherey();
 		bool isOdd(int x) { return (x % 2) ? true : false; }
 
 	public:
@@ -127,6 +124,10 @@ namespace TableSpace
 
 		Coord HiToAbs(Coord);
 		Coord AbsToHi(Coord);
+
+		void gotoxy(int column = wherex(), int line = wherey());
+		int static wherex();
+		int static wherey();
 
 		~Table();
 	};
