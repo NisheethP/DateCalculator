@@ -57,21 +57,41 @@ int main()
 	Table::Coord curCoord = {10,15};
 	Date1.gotoxy(curCoord.x, curCoord.y);
 	
-	int POS_DAYS = ((days>0) ? days : -days);
+	if (days != 0)
+	{
 
-	cout << boost::gregorian::to_simple_string(Date2.getDate(0).toDate()) << " is ";
-	TableSpace::hilight(curCoord, 11, TableSpace::Colour::Cyan, TableSpace::Colour::None);
-	curCoord.x += 15;
+		int POS_DAYS = ((days>0) ? days : -days);
 
-	cout << POS_DAYS<< " Days";
-	TableSpace::hilight(curCoord, numDigits(POS_DAYS) + ((days>0) ? 7 : 6), TableSpace::Colour::Red, TableSpace::Colour::None);
-	cout << ((days>0)?" Before ": " After ");
-	curCoord.x += ((days > 0) ? 7 : 6) + numDigits(POS_DAYS);
-	
-	cout << boost::gregorian::to_simple_string(Date1.getDate(0).toDate());
-	
-	TableSpace::hilight(curCoord, 11, TableSpace::Colour::Cyan, TableSpace::Colour::None);
+		cout << boost::gregorian::to_simple_string(Date2.getDate(0).toDate()) << " is ";
+		TableSpace::hilight(curCoord, 11, TableSpace::Colour::Cyan, TableSpace::Colour::None);
+		curCoord.x += 15;
+
+		cout << POS_DAYS << " DAY";
+		
+		if (POS_DAYS != 1)
+			cout << "S";
+		
+		cout << ((days > 0) ? " before " : " after ");
+		
+		//THIS IS LENGTH OF THE MIDDLE HILIGHT
+		//THIS IS NUMBER OF DIGITS IN THE DURATION + CHARACTERS IN "DAY"/"DAYS" + CHARACTERS IN "BEFORE"/"AFTER"
+		short hiLen = (numDigits(POS_DAYS) + ((POS_DAYS == 1) ? 5 : 6) + ((days > 0) ? 7 : 6));
+		
+		TableSpace::hilight(curCoord, hiLen, TableSpace::Colour::Red, TableSpace::Colour::None);
+		curCoord.x += hiLen;
+		cout << boost::gregorian::to_simple_string(Date1.getDate(0).toDate());
+
+		TableSpace::hilight(curCoord, 11, TableSpace::Colour::Cyan, TableSpace::Colour::None);
+	}
+	else if (days == 0)
+	{
+		cout << "The two dates :: " << boost::gregorian::to_simple_string(Date1.getDate(0).toDate()) << " :: are same.";
+		curCoord.x += sizeof("The two dates :: ") -1;
+		TableSpace::hilight(curCoord, 11 ,TableSpace::Colour::Cyan, TableSpace::Colour::None);
+	}
+
 	std::cin.get();
+
 	return 0;
 }
 
@@ -258,7 +278,7 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case 'w':
+		case 's':
 			if (date.HiToAbs(date.getHiCoord()).x == 0)
 			{
 				Date tempDate = date.getDate(0);
@@ -311,7 +331,7 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case 's':
+		case 'w':
 			if (date.HiToAbs(date.getHiCoord()).x == 0)
 			{
 				Date tempDate = date.getDate(0);
