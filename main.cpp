@@ -3,9 +3,21 @@
 #include <iostream>
 #include <conio.h>
 #include <cmath>
+#include <tuple>
 
 using TableSpace::Table;
 typedef boost::gregorian::date bDate;
+typedef std::tuple<int, bool, int> arrowInput;
+
+enum KeyPress 
+{
+	Up,
+	Down,
+	Left,
+	Right,
+	Enter,
+	Other
+};
 
 const unsigned short MIN_YEAR = 1400;
 const unsigned short MAX_YEAR = 10000;
@@ -25,6 +37,26 @@ void IncreaseAllDate(Date &pDate);
 
 Date TakeInp(Table& pDate);
 int numDigits(long int);
+arrowInput getArrowInput()
+{
+	char x = _getch();
+	char y;
+	bool isArrow = false;
+	
+	//_getch() puts two numbers in the buffer if one of the arrow keys is pressed. One of them is constant
+	//char(224) is the constant part identifying it as an ARROW KEY
+	//The second _getch() won't ever trigger as the number in the buffer will simply be returned to y.
+	if (x == (char)224)
+	{
+		y = _getch();
+		isArrow = true;
+	}
+	else 
+		y = 1;
+
+	return arrowInput(y, isArrow, x);
+}
+
 //==============================
 // MAIN FUNCTION
 //==============================
@@ -40,11 +72,13 @@ int main()
 	Date tempDate;
 	
 	Date1.gotoxy(Date1.getInitCoord().x, Date1.getInitCoord().y - 3);
+	TableSpace::hilight({ Date1.getInitCoord().x-8, Date1.getInitCoord().y - 3 }, 70, TableSpace::Colour::Magenta, TableSpace::Colour::None);
 	cout <<"Enter first Date: ";
 	tempDate = TakeInp(Date1);
 	Date1.setDate(tempDate, 0);
 	
 	Date2.gotoxy(Date2.getInitCoord().x, Date2.getInitCoord().y - 3);
+	TableSpace::hilight({ Date2.getInitCoord().x, Date2.getInitCoord().y - 3 }, 25,TableSpace::Colour::Magenta,TableSpace::Colour::None);
 	cout << "Enter Second Date: ";
 	tempDate = TakeInp(Date2);
 	Date2.setDate(tempDate, 0);
@@ -244,7 +278,35 @@ Date TakeInp(Table& pDate)
 		TableSpace::delight(date_Yesterday.getInitCoord(), 25, TableSpace::Gray);
 		TableSpace::delight(date_Morrow.getInitCoord(), 25, TableSpace::Gray);
 
-		char userInp = _getch();
+		arrowInput userInp(getArrowInput());
+		KeyPress keyPress;
+		if (std::get<1>(userInp))
+		{
+			switch (std::get<0>(userInp))
+			{
+			case 72:
+				keyPress = Up;
+				break;
+			case 75:
+				keyPress = Left;
+				break;
+			case 77:
+				keyPress = Right;
+				break;
+			case 80:
+				keyPress = Down;
+				break;
+			default:
+				keyPress = Other;
+			}
+		}
+		else
+		{
+			if (std::get<2>(userInp) == 13)
+				keyPress = Enter;
+			else
+				keyPress = Other;
+		}
 
 		/*
 		 *This do-While Loop is to take input from the user dynamically.
@@ -256,9 +318,9 @@ Date TakeInp(Table& pDate)
 		 * char(13) is ENTER KEY
 		 */
 
-		switch (userInp)
+		switch (keyPress)
 		{
-		case 'd':
+		case Right:
 			if (date.getHiCoord().x != date.AbsToHi({ 2, 0 }).x)
 			{
 				Table::Coord newCoord = { 0, 0 };
@@ -268,7 +330,7 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case 'a':
+		case Left:
 			if (date.getHiCoord().x != date.AbsToHi({ 0, 0 }).x)
 			{
 				Table::Coord newCoord = { 0, 0 };
@@ -278,7 +340,7 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case 's':
+		case Down:
 			if (date.HiToAbs(date.getHiCoord()).x == 0)
 			{
 				Date tempDate = date.getDate(0);
@@ -331,7 +393,7 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case 'w':
+		case Up:
 			if (date.HiToAbs(date.getHiCoord()).x == 0)
 			{
 				Date tempDate = date.getDate(0);
@@ -384,10 +446,11 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case 13:
+		case Enter:
 			isLoopGoing = false;
 			break;
-
+		case Other:
+			break;
 		default:
 			break;
 		}
