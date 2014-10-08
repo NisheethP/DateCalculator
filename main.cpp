@@ -6,6 +6,7 @@
 #include <tuple>
 
 using TableSpace::Table;
+using std::string;
 typedef boost::gregorian::date bDate;
 typedef std::tuple<int, bool, int> arrowInput;
 
@@ -16,6 +17,7 @@ enum KeyPress
 	Left,
 	Right,
 	Enter,
+	E,
 	Other
 };
 
@@ -37,25 +39,8 @@ void IncreaseAllDate(Date &pDate);
 
 Date TakeInp(Table& pDate);
 int numDigits(long int);
-arrowInput getArrowInput()
-{
-	char x = _getch();
-	char y;
-	bool isArrow = false;
-	
-	//_getch() puts two numbers in the buffer if one of the arrow keys is pressed. One of them is constant
-	//char(224) is the constant part identifying it as an ARROW KEY
-	//The second _getch() won't ever trigger as the number in the buffer will simply be returned to y.
-	if (x == (char)224)
-	{
-		y = _getch();
-		isArrow = true;
-	}
-	else 
-		y = 1;
-
-	return arrowInput(y, isArrow, x);
-}
+arrowInput getArrowInput();
+string getDynamicStrin();
 
 //==============================
 // MAIN FUNCTION
@@ -285,42 +270,50 @@ Date TakeInp(Table& pDate)
 			switch (std::get<0>(userInp))
 			{
 			case 72:
-				keyPress = Up;
+				keyPress = KeyPress::Up;
 				break;
 			case 75:
-				keyPress = Left;
+				keyPress = KeyPress::Left;
 				break;
 			case 77:
-				keyPress = Right;
+				keyPress = KeyPress::Right;
 				break;
 			case 80:
-				keyPress = Down;
+				keyPress = KeyPress::Down;
 				break;
 			default:
-				keyPress = Other;
+				keyPress = KeyPress::Other;
 			}
 		}
 		else
 		{
-			if (std::get<2>(userInp) == 13)
-				keyPress = Enter;
-			else
-				keyPress = Other;
+			switch (std::get<2>(userInp))
+			{
+			case 13:
+				keyPress = KeyPress::Enter;
+				break;
+			case 'E':
+			case 'e':
+				keyPress = KeyPress::E;
+				break;
+			default:
+				keyPress = KeyPress::Other;
+				break;
+			}
 		}
 
 		/*
 		 *This do-While Loop is to take input from the user dynamically.
 		 *I use _getch to get unbuffered input (WINDOWS only funciton) from the user.
-		 *After getting the input, it will check if it is one of the W-S-A-D keys and
-		 *treat them as ARROW keys in same arrangement. The cases will check if the HILIGHT
-		 *is not already at the edge, and if not, move it in that direction
+		 *The cases will check if the HILIGHT is not already at the edge, and if not, 
+		 *move it in that direction
 		 *The Table::hiCoord needs to be adjusted for each case.
-		 * char(13) is ENTER KEY
+		 *char(13) is ENTER KEY
 		 */
 
 		switch (keyPress)
 		{
-		case Right:
+		case KeyPress::Right:
 			if (date.getHiCoord().x != date.AbsToHi({ 2, 0 }).x)
 			{
 				Table::Coord newCoord = { 0, 0 };
@@ -330,7 +323,7 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case Left:
+		case KeyPress::Left:
 			if (date.getHiCoord().x != date.AbsToHi({ 0, 0 }).x)
 			{
 				Table::Coord newCoord = { 0, 0 };
@@ -340,10 +333,10 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case Down:
+		case KeyPress::Down:
 			if (date.HiToAbs(date.getHiCoord()).x == 0)
 			{
-				Date tempDate = date.getDate(0);
+				tempDate = date.getDate(0);
 
 				tempDate = date.getDate(0);
 				ReduceDate(tempDate);
@@ -361,7 +354,7 @@ Date TakeInp(Table& pDate)
 
 			if (date.HiToAbs(date.getHiCoord()).x == 1)
 			{
-				Date tempDate = date.getDate(0);
+				tempDate = date.getDate(0);
 				ReduceMonth(tempDate);
 				date.setDate(tempDate, 0);
 
@@ -376,7 +369,7 @@ Date TakeInp(Table& pDate)
 
 			if (date.HiToAbs(date.getHiCoord()).x == 2)
 			{
-				Date tempDate = date_Yesterday.getDate(0);
+				tempDate = date_Yesterday.getDate(0);
 				if (date_Yesterday.getDate(0).getYear() > MIN_YEAR)
 					ReduceYear(tempDate);
 				date_Yesterday.setDate(tempDate, 0);
@@ -393,10 +386,10 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case Up:
+		case KeyPress::Up:
 			if (date.HiToAbs(date.getHiCoord()).x == 0)
 			{
-				Date tempDate = date.getDate(0);
+				tempDate = date.getDate(0);
 
 				tempDate = date.getDate(0);
 				IncreaseDate(tempDate);
@@ -414,7 +407,7 @@ Date TakeInp(Table& pDate)
 
 			if (date.HiToAbs(date.getHiCoord()).x == 1)
 			{
-				Date tempDate = date.getDate(0);
+				tempDate = date.getDate(0);
 				IncreaseMonth(tempDate);
 				date.setDate(tempDate, 0);
 
@@ -429,7 +422,7 @@ Date TakeInp(Table& pDate)
 
 			if (date.HiToAbs(date.getHiCoord()).x == 2)
 			{
-				Date tempDate = date_Yesterday.getDate(0);
+				tempDate = date_Yesterday.getDate(0);
 				if (date_Yesterday.getDate(0).getYear() < MAX_YEAR - 2)
 					IncreaseYear(tempDate);
 				date_Yesterday.setDate(tempDate, 0);
@@ -446,8 +439,77 @@ Date TakeInp(Table& pDate)
 			}
 			break;
 
-		case Enter:
+		case KeyPress::Enter:
 			isLoopGoing = false;
+			break;
+		case KeyPress::E:
+			date_Morrow.gotoxy(date_Morrow.getInitCoord().x, date_Morrow.getInitCoord().y + 3);
+			if (date.HiToAbs(date.getHiCoord()).x == 0)
+			{
+				Table::Coord tempCoord = date_Morrow.getInitCoord();
+				tempCoord.y += 3;
+				
+				unsigned short x = 0;
+				std::cin >> x;
+
+				if (x <= 0)
+					x = 1;
+				else if (x > 31)
+					x = 31;
+
+				tempDate = date.getDate(0);
+				tempDate.setDate(x);
+				date.setDate(tempDate, 0);
+
+				ReduceAllDate(tempDate);			//NEEDS TO BE CANCEELED OUT. INCREEASE TWICE
+				date_Yesterday.setDate(tempDate, 0);
+
+				IncreaseAllDate(tempDate);
+				IncreaseAllDate(tempDate);			//TWICE TO CANCEL THE REDUCTION ABOVE
+				date_Morrow.setDate(tempDate, 0);
+			}
+
+			if (date.HiToAbs(date.getHiCoord()).x == 1)
+			{
+				Table::Coord tempCoord = date_Morrow.getInitCoord();
+				tempCoord.y += 3;
+				TableSpace::hilight(tempCoord, 10, TableSpace::Colour::DarkRed, TableSpace::Colour::Yellow);
+
+				TableSpace::delight(tempCoord, 10);
+			}
+
+			if (date.HiToAbs(date.getHiCoord()).x == 2)
+			{
+				Table::Coord tempCoord = date_Morrow.getInitCoord();
+				tempCoord.y += 3;
+				
+				unsigned int x = 0;
+				std::cin >> x;
+
+				if (x <= 1400)
+					x = 1401;
+				else if (x >= 10000)
+					x = 9999;
+
+				tempDate = date.getDate(0);
+				tempDate.setYear(x);
+				date.setDate(tempDate, 0);
+				date_Yesterday.setDate(tempDate, 0);
+				date_Morrow.setDate(tempDate, 0);
+				
+				//tempDate = date_Yesterday.getDate(0);
+				if (tempDate.getYear() > MIN_YEAR)
+					ReduceAllDate(tempDate);				//NEEDS TO BE CANCEELED OUT. INCREEASE TWICE
+				date_Yesterday.setDate(tempDate, 0);
+
+				//tempDate = date_Morrow.getDate(0);
+				if (tempDate.getYear() < MAX_YEAR-1)		// MAX_YEAR - 1  AS tempDate IS ALREADY REDUCED ONCE
+				{
+					IncreaseAllDate(tempDate);
+					IncreaseAllDate(tempDate);				//TWICE TO CANCEL THE REDUCTION ABOVE
+				}
+				date_Morrow.setDate(tempDate, 0);
+			}
 			break;
 		case Other:
 			break;
@@ -466,4 +528,33 @@ int numDigits(long int pNum)
 {
 	string s = std::to_string(pNum);
 	return s.length();
+}
+
+//TAKE KEY PRESS INPUT: ALSO HANDLE ARROWKEYS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arrowInput getArrowInput()
+{
+	char x = _getch();
+	char y;
+	bool isArrow = false;
+
+	//_getch() puts two numbers in the buffer if one of the arrow keys is pressed. One of them is constant
+	//char(224) is the constant part identifying it as an ARROW KEY
+	//The second _getch() won't ever trigger as the number in the buffer will simply be returned to y.
+	if (x == (char)224)
+	{
+		y = _getch();
+		isArrow = true;
+	}
+	else
+		y = 1;
+
+	return arrowInput(y, isArrow, x);
+}
+
+//GET INPUT DYNAMICALLY
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+string getDynamicInput()
+{
+	return "";
 }
