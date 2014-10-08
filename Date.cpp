@@ -1,5 +1,7 @@
 #include "Date.h"
 #include "Table.h"
+#include <cctype>
+#include <algorithm>
 
 using std::string;
 
@@ -273,4 +275,48 @@ Month ConvMonth(boost::gregorian::greg_month pMonth)
 	default:
 		return Error;
 	}	
+}
+
+struct to_lower
+{
+	int operator() (int ch)
+	{
+		return std::tolower(ch);
+	}
+};
+
+Month StrToMonth(std::string str)
+{
+	Month month;
+	
+	std::transform(str.begin(), str.end(), str.begin(), to_lower());
+
+	if (str == "january")
+		month = January;
+	else if (str == "february")
+		month = February;
+	else if (str == "march")
+		month = March;
+	else if (str == "april")
+		month = April;
+	else if (str == "may")
+		month = May;
+	else if (str == "june")
+		month= June;
+	else if (str == "july")
+		month = July;
+	else if (str == "august")
+		month = August;
+	else if (str == "september")
+		month = September;
+	else if (str == "october")
+		month = October;
+	else if (str == "november")
+		month = November;
+	else if (str == "december")
+		month = December;
+	else
+		month = Error;
+
+	return month;
 }

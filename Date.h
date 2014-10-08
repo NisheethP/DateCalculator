@@ -66,5 +66,6 @@ public:
 //=============================
 bool MonthToStr(Month pMonth, std::string &monthName);
 Month ConvMonth(boost::gregorian::greg_month pMonth);
+Month StrToMonth(std::string str);
 
 #endif
