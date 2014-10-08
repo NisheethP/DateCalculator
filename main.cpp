@@ -18,6 +18,7 @@ enum KeyPress
 	Right,
 	Enter,
 	E,
+	BackSpace,
 	Other
 };
 
@@ -40,7 +41,7 @@ void IncreaseAllDate(Date &pDate);
 Date TakeInp(Table& pDate);
 int numDigits(long int);
 arrowInput getArrowInput();
-string getDynamicStrin();
+string getDynamicInput(Table::Coord crd);
 
 //==============================
 // MAIN FUNCTION
@@ -48,9 +49,9 @@ string getDynamicStrin();
 
 int main()
 {
+	StrToMonth("JaNuary");
 	TableSpace::SetDefaultColour();
 	
-	 
 	Table Date1(1, { 18, 14 }, { 7, 2 });
 	Table Date2(1, { 18, 14 }, { 7, 2 });
 	
@@ -444,6 +445,7 @@ Date TakeInp(Table& pDate)
 			break;
 		case KeyPress::E:
 			date_Morrow.gotoxy(date_Morrow.getInitCoord().x, date_Morrow.getInitCoord().y + 3);
+			
 			if (date.HiToAbs(date.getHiCoord()).x == 0)
 			{
 				Table::Coord tempCoord = date_Morrow.getInitCoord();
@@ -473,9 +475,23 @@ Date TakeInp(Table& pDate)
 			{
 				Table::Coord tempCoord = date_Morrow.getInitCoord();
 				tempCoord.y += 3;
-				TableSpace::hilight(tempCoord, 10, TableSpace::Colour::DarkRed, TableSpace::Colour::Yellow);
+				
+				string month = getDynamicInput(tempCoord);
+				Month curMonth = StrToMonth(month);
 
-				TableSpace::delight(tempCoord, 10);
+				if(curMonth != Month::Error)
+				{
+					tempDate = date.getDate(0);
+					tempDate.setMonth(curMonth);
+					date.setDate(tempDate, 0);
+
+					ReduceAllDate(tempDate);			//NEEDS TO BE CANCEELED OUT. INCREEASE TWICE
+					date_Yesterday.setDate(tempDate, 0);
+
+					IncreaseAllDate(tempDate);
+					IncreaseAllDate(tempDate);			//TWICE TO CANCEL THE REDUCTION ABOVE
+					date_Morrow.setDate(tempDate, 0);
+				}
 			}
 
 			if (date.HiToAbs(date.getHiCoord()).x == 2)
@@ -510,6 +526,10 @@ Date TakeInp(Table& pDate)
 				}
 				date_Morrow.setDate(tempDate, 0);
 			}
+
+			date_Morrow.gotoxy(date_Morrow.getInitCoord().x, date_Morrow.getInitCoord().y + 3);
+			for (int i = 0; i < 20; i++)
+				cout << " ";
 			break;
 		case Other:
 			break;
@@ -554,7 +574,42 @@ arrowInput getArrowInput()
 
 //GET INPUT DYNAMICALLY
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-string getDynamicInput()
+string getDynamicInput(Table::Coord crd)
 {
-	return "";
+	bool isLoopGoing = true;
+	Table::Coord tempCoord = crd;
+	string dynString = "";
+
+	Table tempTable;
+	tempTable.gotoxy(tempCoord.x, tempCoord.y);
+	
+	do
+	{
+		arrowInput userInp(getArrowInput());
+		if (!(std::get<1>(userInp)))
+		{
+			switch (std::get<2>(userInp))
+			{
+			case 13:
+				isLoopGoing = false;
+				break;
+			case 8:
+				if (tempCoord.x > crd.x)
+				{
+					tempCoord.x -= 1;
+					tempTable.gotoxy(tempCoord.x, tempCoord.y);
+					cout << " ";
+				}
+				break;
+			default:
+				cout << (char)std::get<2>(userInp);
+				dynString += (char)std::get<2>(userInp);
+				tempCoord.x++;
+				break;
+			}
+		}
+
+		tempTable.gotoxy(tempCoord.x, tempCoord.y);
+	} while (isLoopGoing);
+	return dynString;
 }
