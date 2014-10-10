@@ -580,7 +580,10 @@ string getDynamicInput(Table::Coord crd)
 {
 	string months[13] ={"january", "february", "march", "april",
 						"may", "june", "july", "august", "september",
-						"october", "november", "december", "ERROR"
+						"october", "november", "december", "ERROR_MONTH_ллллллллллллллллллллллл"
+						/*л is a place holder to make it larger than most possible inputs from user. 
+						 *Using ERROR only crashed it at any thing longer than 5 letters.
+						 */
 						};
 
 	const int MAX_STR_LENGTH = 100;
@@ -662,11 +665,15 @@ string getDynamicInput(Table::Coord crd)
 			cout << tempString << outputMonth;
 			TableSpace::delight(crd,curLength,TableSpace::Colour::Red);
 			TableSpace::delight({ crd.x + curLength, crd.y }, months[monthNum].length() - curLength, TableSpace::Colour::DarkMagenta);
+
+			if (monthNum != 12 && !isLoopGoing)
+			{
+				dynString = tempMonth;
+			}
 		}
 
 		tempTable.gotoxy(tempCoord.x, tempCoord.y);
 	} while (isLoopGoing);
-	int stringLength = 100;
 	
 	dynString = truncateString(dynString, dynString.length());
 	
