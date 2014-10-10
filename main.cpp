@@ -270,16 +270,16 @@ Date TakeInp(Table& pDate)
 		{
 			switch (std::get<0>(userInp))
 			{
-			case 72:
+			case 72 /*UP*/:
 				keyPress = KeyPress::Up;
 				break;
-			case 75:
+			case 75 /*LEFT*/:
 				keyPress = KeyPress::Left;
 				break;
-			case 77:
+			case 77 /*RIGHT*/:
 				keyPress = KeyPress::Right;
 				break;
-			case 80:
+			case 80 /*DOWN*/:
 				keyPress = KeyPress::Down;
 				break;
 			default:
@@ -290,7 +290,7 @@ Date TakeInp(Table& pDate)
 		{
 			switch (std::get<2>(userInp))
 			{
-			case 13:
+			case 13 /*ENTER*/:
 				keyPress = KeyPress::Enter;
 				break;
 			case 'E':
@@ -576,12 +576,17 @@ arrowInput getArrowInput()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 string getDynamicInput(Table::Coord crd)
 {
+	const int MAX_STR_LENGTH = 100;
 	bool isLoopGoing = true;
 	Table::Coord tempCoord = crd;
-	string dynString = "";
-
+	string dynString = "", outputString = "";
+	
+	for (int i = 0; i < MAX_STR_LENGTH; i++)
+		dynString += ' ';
+	
 	Table tempTable;
 	tempTable.gotoxy(tempCoord.x, tempCoord.y);
+	int curLength = 0;
 	
 	do
 	{
@@ -590,26 +595,46 @@ string getDynamicInput(Table::Coord crd)
 		{
 			switch (std::get<2>(userInp))
 			{
-			case 13:
+			case 13 /*ENTER*/:
+				//IN CASE OF ENTER, TERMINATE LOOP
 				isLoopGoing = false;
 				break;
-			case 8:
+			case 8 /*BACKSPACE*/:
+				//IN CASE OF BACKSPACE, MOVE ONE BACK ON DISPLAY & ALSO EDIT STRING
 				if (tempCoord.x > crd.x)
 				{
 					tempCoord.x -= 1;
 					tempTable.gotoxy(tempCoord.x, tempCoord.y);
 					cout << " ";
+					curLength--;
+					dynString[curLength] = ' ';					
 				}
 				break;
 			default:
+				//IN CASE OF ANY KEY PRESS, OUTPUT ON SCREEN AND ADD TO STRING
 				cout << (char)std::get<2>(userInp);
-				dynString += (char)std::get<2>(userInp);
+				dynString[curLength] = (char)std::get<2>(userInp);
 				tempCoord.x++;
+				curLength++;
 				break;
 			}
 		}
 
 		tempTable.gotoxy(tempCoord.x, tempCoord.y);
 	} while (isLoopGoing);
+	int stringLength = 100;
+
+	for (int i = MAX_STR_LENGTH-1; i >= 0 ; --i)
+	{	
+		if (dynString[i] == ' ')
+		{
+			stringLength--;
+		}
+		else
+			break;
+	}
+
+	dynString.resize(stringLength);
+	
 	return dynString;
 }
