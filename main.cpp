@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <cmath>
 #include <tuple>
+#include <cctype>
 
 using TableSpace::Table;
 using std::string;
@@ -42,6 +43,7 @@ Date TakeInp(Table& pDate);
 int numDigits(long int);
 arrowInput getArrowInput();
 string getDynamicInput(Table::Coord crd);
+string truncateString(string str, const int MAX_STR_LENGTH);
 
 //==============================
 // MAIN FUNCTION
@@ -576,10 +578,15 @@ arrowInput getArrowInput()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 string getDynamicInput(Table::Coord crd)
 {
+	string months[13] ={"january", "february", "march", "april",
+						"may", "june", "july", "august", "september",
+						"october", "november", "december", "ERROR"
+						};
+
 	const int MAX_STR_LENGTH = 100;
 	bool isLoopGoing = true;
 	Table::Coord tempCoord = crd;
-	string dynString = "", outputString = "";
+	string dynString = "", tempString = "";
 	
 	for (int i = 0; i < MAX_STR_LENGTH; i++)
 		dynString += ' ';
@@ -587,9 +594,10 @@ string getDynamicInput(Table::Coord crd)
 	Table tempTable;
 	tempTable.gotoxy(tempCoord.x, tempCoord.y);
 	int curLength = 0;
-	
+	int monthNum = 0;
 	do
 	{
+		monthNum = 12;
 		arrowInput userInp(getArrowInput());
 		if (!(std::get<1>(userInp)))
 		{
@@ -618,23 +626,67 @@ string getDynamicInput(Table::Coord crd)
 				curLength++;
 				break;
 			}
+			tempString = truncateString(dynString, dynString.length());
+			
+			for (int monthsIter = 0; monthsIter < 12; ++monthsIter)
+			{
+				string tempMonth;
+				tempMonth = months[monthsIter];
+				tempMonth.resize(curLength);
+				
+				if (Lowerize(tempMonth) == Lowerize(tempString))
+				{
+					monthNum = monthsIter;
+					break;
+				}
+			}
+			
+			tempTable.gotoxy(crd.x, crd.y);
+			
+			for (int i = 0; i < 40; i++)
+				cout << ' ';
+
+			tempTable.gotoxy(crd.x, crd.y);
+			string tempMonth = months[monthNum];
+			string outputMonth = "                                        ";
+			//tempMonth.resize(curLength);
+
+			for (int i = 0; i < tempMonth.length() - curLength; i++)
+			{
+				outputMonth[i] = tempMonth[i + curLength];
+			}
+
+			outputMonth = truncateString(outputMonth, outputMonth.length());
+			if (monthNum == 12)
+				outputMonth.clear();
+			cout << tempString << outputMonth;
+			TableSpace::delight(crd,curLength,TableSpace::Colour::Red);
+			TableSpace::delight({ crd.x + curLength, crd.y }, months[monthNum].length() - curLength, TableSpace::Colour::DarkMagenta);
 		}
 
 		tempTable.gotoxy(tempCoord.x, tempCoord.y);
 	} while (isLoopGoing);
 	int stringLength = 100;
+	
+	dynString = truncateString(dynString, dynString.length());
+	
+	return dynString;
+}
 
-	for (int i = MAX_STR_LENGTH-1; i >= 0 ; --i)
-	{	
-		if (dynString[i] == ' ')
+string truncateString(string str, const int MAX_STR_LENGTH)
+{
+	int stringLength = MAX_STR_LENGTH;
+
+	for (int i = MAX_STR_LENGTH - 1; i >= 0; --i)
+	{
+		if (str[i] == ' ')
 		{
 			stringLength--;
 		}
 		else
 			break;
 	}
+	str.resize(stringLength);
 
-	dynString.resize(stringLength);
-	
-	return dynString;
+	return str;
 }

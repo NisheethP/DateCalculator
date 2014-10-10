@@ -136,8 +136,7 @@ namespace TableSpace
 	WORD ColourToFore(Colour);
 	WORD ColourToBack(Colour);
 	
-	void SetDefaultColour(Colour colour = TableSpace::Colour::White);
-
+	void SetDefaultColour(Colour colour = Colour::White);
 	void hilight(Table::Coord crd, int length, Colour fore = Colour::DarkBlue, Colour back = Colour::White);
 	void delight(Table::Coord crd, int length, Colour fore = Colour::White, Colour back = Colour::None);
 }

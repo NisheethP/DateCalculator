@@ -285,11 +285,19 @@ struct to_lower
 	}
 };
 
+std::string Lowerize(std::string str)
+{
+	std::string tempString = str;
+	std::transform(str.begin(), str.end(), tempString.begin(), to_lower());
+	return tempString;
+}
+
 Month StrToMonth(std::string str)
 {
 	Month month;
 	
-	std::transform(str.begin(), str.end(), str.begin(), to_lower());
+	//std::transform(str.begin(), str.end(), str.begin(), to_lower());
+	Lowerize(str);
 
 	if (str == "january")
 		month = January;
