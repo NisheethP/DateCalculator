@@ -580,7 +580,7 @@ string getDynamicInput(Table::Coord crd)
 {
 	string months[13] ={"january", "february", "march", "april",
 						"may", "june", "july", "august", "september",
-						"october", "november", "december", "ERROR_MONTH_ллллллллллллллллллллллллллллллллллл"
+						"october", "november", "december", "ERROR_MONTH_ллллллллллллллллллллллллллл"
 						/*л is a place holder to make it larger than most possible inputs from user. 
 						 *Using ERROR only crashed it at any thing longer than 5 letters.
 						 */
