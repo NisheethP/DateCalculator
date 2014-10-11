@@ -590,7 +590,8 @@ string getDynamicInput(Table::Coord crd)
 	bool isLoopGoing = true;
 	Table::Coord tempCoord = crd;
 	string dynString = "", tempString = "";
-	
+	std::vector<string> otherMonths;
+		
 	for (int i = 0; i < MAX_STR_LENGTH; i++)
 		dynString += ' ';
 	
@@ -598,8 +599,10 @@ string getDynamicInput(Table::Coord crd)
 	tempTable.gotoxy(tempCoord.x, tempCoord.y);
 	int curLength = 0;
 	int monthNum = 0;
+	int predictionRow = 1;
 	do
 	{
+		otherMonths.clear();
 		monthNum = 12;
 		arrowInput userInp(getArrowInput());
 		if (!(std::get<1>(userInp)))
@@ -633,14 +636,36 @@ string getDynamicInput(Table::Coord crd)
 			
 			for (int monthsIter = 0; monthsIter < 12; ++monthsIter)
 			{
-				string tempMonth;
-				tempMonth = months[monthsIter];
-				tempMonth.resize(curLength);
-				
-				if (Lowerize(tempMonth) == Lowerize(tempString))
+				string tMonth;
+				tMonth = months[monthsIter];
+				tMonth.resize(curLength);
+				if (curLength != 0)
 				{
-					monthNum = monthsIter;
-					break;
+
+					if (Lowerize(tMonth) == Lowerize(tempString))
+					{
+						monthNum = monthsIter;
+						break;
+					}
+				}
+			}
+
+			/*This loop will iterate through all the months and put in an array all those months
+			 *that have the same letter as the first one apart fromt the one set above
+			 *This can then list all those months.
+			 */
+			for (int monthsIter = 0; monthsIter < 12; ++monthsIter)
+			{
+				string tMonth;
+				tMonth = months[monthsIter];
+				tMonth.resize(curLength);
+				if (curLength != 0)
+				{
+					if (Lowerize(tMonth) == Lowerize(tempString))
+					{
+						if (monthsIter != monthNum)
+							otherMonths.push_back(months[monthsIter]);
+					}
 				}
 			}
 			
@@ -652,8 +677,7 @@ string getDynamicInput(Table::Coord crd)
 			tempTable.gotoxy(crd.x, crd.y);
 			string tempMonth = months[monthNum];
 			string outputMonth = "                                        ";
-			//tempMonth.resize(curLength);
-
+			
 			for (int i = 0; i < tempMonth.length() - curLength; i++)
 			{
 				outputMonth[i] = tempMonth[i + curLength];
@@ -665,6 +689,53 @@ string getDynamicInput(Table::Coord crd)
 			cout << tempString << outputMonth;
 			TableSpace::delight(crd,curLength,TableSpace::Colour::Red);
 			TableSpace::delight({ crd.x + curLength, crd.y }, months[monthNum].length() - curLength, TableSpace::Colour::DarkMagenta);
+			
+			for (int i = 0; i < 12; ++i)
+			{
+				tempTable.gotoxy(crd.x, crd.y + 1 + i);
+				for (int i = 0; i < 40; i++)
+					cout << " ";
+			}
+			
+			for (int i = 0; i < otherMonths.size(); ++i)
+			{
+				
+				
+				tempTable.gotoxy(crd.x, crd.y + 1 + i);
+				cout << otherMonths[i];
+				
+				TableSpace::delight({ crd.x, crd.y + 1 + i }, otherMonths[i].length(), TableSpace::Colour::DarkMagenta);
+			}
+
+			KeyPress keyPress;
+			if (std::get<1>(userInp))
+			{
+				switch (std::get<0>(userInp))
+				{
+				case 72 /*UP*/:
+					keyPress = KeyPress::Up;
+					break;
+				case 80 /*DOWN*/:
+					keyPress = KeyPress::Down;
+					break;
+				default:
+					keyPress = KeyPress::Other;
+				}
+			}
+
+			switch (keyPress)
+			{
+			case Up:
+				if (predictionRow > 1)
+				{
+				}
+				break;
+			case Down:
+				if (predictionRow < 1)
+				{
+				}
+				break;
+			}
 
 			if (monthNum != 12 && !isLoopGoing)
 			{
@@ -680,20 +751,19 @@ string getDynamicInput(Table::Coord crd)
 	return dynString;
 }
 
+//TRUNCATE STRING TO REMOVE SPACE BARS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 string truncateString(string str, const int MAX_STR_LENGTH)
 {
-	int stringLength = MAX_STR_LENGTH;
-
 	for (int i = MAX_STR_LENGTH - 1; i >= 0; --i)
 	{
 		if (str[i] == ' ')
 		{
-			stringLength--;
+			str.pop_back();
 		}
 		else
 			break;
 	}
-	str.resize(stringLength);
 
 	return str;
 }
