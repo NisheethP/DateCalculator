@@ -580,12 +580,15 @@ string getDynamicInput(Table::Coord crd)
 {
 	string months[13] ={"january", "february", "march", "april",
 						"may", "june", "july", "august", "september",
-						"october", "november", "december", "ERROR"
+						"october", "november", "december", "ERROR_MONTH_ллллллллллллллллллллллллллллллллллл"
+						/*л is a place holder to make it larger than most possible inputs from user. 
+						 *Using ERROR only crashed it at any thing longer than 5 letters.
+						 */
 						};
 
 	const int MAX_STR_LENGTH = 100;
 	bool isLoopGoing = true;
-	Table::Coord tempCoord = crd, rowCoord = crd;
+	Table::Coord tempCoord = crd;
 	string dynString = "", tempString = "";
 	std::vector<string> otherMonths;
 		
@@ -618,7 +621,7 @@ string getDynamicInput(Table::Coord crd)
 					tempTable.gotoxy(tempCoord.x, tempCoord.y);
 					cout << " ";
 					curLength--;
-					dynString[curLength] = ' ';
+					dynString[curLength] = ' ';					
 				}
 				break;
 			default:
@@ -629,101 +632,89 @@ string getDynamicInput(Table::Coord crd)
 				curLength++;
 				break;
 			}
-		}
-		tempString = truncateString(dynString, dynString.length());
+			tempString = truncateString(dynString, dynString.length());
 			
-		for (int monthsIter = 0; monthsIter < 12; ++monthsIter)
-		{
-			string tMonth;
-			tMonth = months[monthsIter];
-			tMonth.resize(curLength);
-			if (curLength != 0)
+			for (int monthsIter = 0; monthsIter < 12; ++monthsIter)
 			{
-
-				if (Lowerize(tMonth) == Lowerize(tempString))
+				string tMonth;
+				tMonth = months[monthsIter];
+				tMonth.resize(curLength);
+				if (curLength != 0)
 				{
-					monthNum = monthsIter;
-					break;
+
+					if (Lowerize(tMonth) == Lowerize(tempString))
+					{
+						monthNum = monthsIter;
+						break;
+					}
 				}
 			}
-		}
 
-		/*This loop will iterate through all the months and put in an array all those months
-			*that have the same letter as the first one apart fromt the one set above
-			*This can then list all those months.
-			*/
-		for (int monthsIter = 0; monthsIter < 12; ++monthsIter)
-		{
-			string tMonth;
-			tMonth = months[monthsIter];
-			tMonth.resize(curLength);
-			if (curLength != 0)
+			/*This loop will iterate through all the months and put in an array all those months
+			 *that have the same letter as the first one apart fromt the one set above
+			 *This can then list all those months.
+			 */
+			for (int monthsIter = 0; monthsIter < 12; ++monthsIter)
 			{
-				if (Lowerize(tMonth) == Lowerize(tempString))
+				string tMonth;
+				tMonth = months[monthsIter];
+				tMonth.resize(curLength);
+				if (curLength != 0)
 				{
-					if (monthsIter != monthNum)
-						otherMonths.push_back(months[monthsIter]);
+					if (Lowerize(tMonth) == Lowerize(tempString))
+					{
+						if (monthsIter != monthNum)
+							otherMonths.push_back(months[monthsIter]);
+					}
 				}
 			}
-		}
 			
-		tempTable.gotoxy(rowCoord.x, rowCoord.y);
+			tempTable.gotoxy(crd.x, crd.y);
 			
-		for (int i = 0; i < 40; i++)
-			cout << ' ';
+			for (int i = 0; i < 40; i++)
+				cout << ' ';
 
-		tempTable.gotoxy(rowCoord.x, rowCoord.y);
-		string tempMonth = months[monthNum];
-		string outputMonth = "                                        ";
+			tempTable.gotoxy(crd.x, crd.y);
+			string tempMonth = months[monthNum];
+			string outputMonth = "                                        ";
 			
-		for (int i = 0; i < tempMonth.length() - curLength; i++)
-		{
-			outputMonth[i] = tempMonth[i + curLength];
-		}
+			for (int i = 0; i < tempMonth.length() - curLength; i++)
+			{
+				outputMonth[i] = tempMonth[i + curLength];
+			}
 
-		outputMonth = truncateString(outputMonth, outputMonth.length());
-		if (monthNum == 12)
-			outputMonth.clear();
-		cout << tempString << outputMonth;
-		TableSpace::delight(rowCoord, curLength, TableSpace::Colour::Red);
-		TableSpace::delight({ rowCoord.x + curLength, rowCoord.y }, months[monthNum].length() - curLength, TableSpace::Colour::DarkMagenta);
+			outputMonth = truncateString(outputMonth, outputMonth.length());
+			if (monthNum == 12)
+				outputMonth.clear();
+			cout << tempString << outputMonth;
+			TableSpace::delight(crd,curLength,TableSpace::Colour::Red);
+			TableSpace::delight({ crd.x + curLength, crd.y }, months[monthNum].length() - curLength, TableSpace::Colour::DarkMagenta);
 			
-		for (int i = 0; i < 12; ++i)
-		{
-			if (i != monthNum)
+			for (int i = 0; i < 12; ++i)
 			{
 				tempTable.gotoxy(crd.x, crd.y + 1 + i);
 				for (int i = 0; i < 40; i++)
 					cout << " ";
 			}
-		}
 			
-		for (int i = 1; i < otherMonths.size()+1; ++i)
-		{
-			tempTable.gotoxy(crd.x, crd.y + i);
-			cout << otherMonths[i-1];
+			for (int i = 0; i < otherMonths.size(); ++i)
+			{
+				
+				
+				tempTable.gotoxy(crd.x, crd.y + 1 + i);
+				cout << otherMonths[i];
+				
+				TableSpace::delight({ crd.x, crd.y + 1 + i }, otherMonths[i].length(), TableSpace::Colour::DarkMagenta);
+			}
 
-			TableSpace::delight({ crd.x, crd.y + i }, otherMonths[i-1].length(), TableSpace::Colour::DarkMagenta);
+			if (monthNum != 12 && !isLoopGoing)
+			{
+				dynString = tempMonth;
+			}
 		}
-		
-		if (monthNum != 12 && !isLoopGoing)
-		{
-			dynString = tempMonth;
-		}
+
 		tempTable.gotoxy(tempCoord.x, tempCoord.y);
 	} while (isLoopGoing);
-
-	for (int i = 0; i < 12; ++i)
-	{
-		tempTable.gotoxy(crd.x, crd.y + 1 + i);
-		for (int i = 0; i < 40; i++)
-			cout << " ";
-	}
-
-	tempTable.gotoxy(tempCoord.x, tempCoord.y);
-
-	int stringLength = 100;
-
 	
 	dynString = truncateString(dynString, dynString.length());
 	
