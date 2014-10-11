@@ -296,7 +296,6 @@ Month StrToMonth(std::string str)
 {
 	Month month;
 	
-	//std::transform(str.begin(), str.end(), str.begin(), to_lower());
 	Lowerize(str);
 
 	if (str == "january")
