@@ -5,6 +5,9 @@
 #include <cmath>
 #include <tuple>
 #include <cctype>
+#include <istream>
+
+
 
 using TableSpace::Table;
 using std::string;
@@ -44,6 +47,8 @@ int numDigits(long int);
 arrowInput getArrowInput();
 string getDynamicInput(Table::Coord crd);
 string truncateString(string str, const int MAX_STR_LENGTH);
+
+void ignore_line(std::istream& in);
 
 //==============================
 // MAIN FUNCTION
@@ -111,6 +116,8 @@ int main()
 		curCoord.x += sizeof("The two dates :: ") -1;
 		TableSpace::hilight(curCoord, 11 ,TableSpace::Colour::Cyan, TableSpace::Colour::None);
 	}
+
+	ignore_line(std::cin);
 
 	std::cin.get();
 
@@ -530,7 +537,7 @@ Date TakeInp(Table& pDate)
 			}
 
 			date_Morrow.gotoxy(date_Morrow.getInitCoord().x, date_Morrow.getInitCoord().y + 3);
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < 20; ++i)
 				cout << " ";
 			break;
 		case Other:
@@ -592,7 +599,7 @@ string getDynamicInput(Table::Coord crd)
 	string dynString = "", tempString = "";
 	std::vector<string> otherMonths;
 		
-	for (int i = 0; i < MAX_STR_LENGTH; i++)
+	for (int i = 0; i < MAX_STR_LENGTH; ++i)
 		dynString += ' ';
 	
 	Table tempTable;
@@ -671,14 +678,14 @@ string getDynamicInput(Table::Coord crd)
 			
 			tempTable.gotoxy(crd.x, crd.y);
 			
-			for (int i = 0; i < 40; i++)
+			for (int i = 0; i < 40; ++i)
 				cout << ' ';
 
 			tempTable.gotoxy(crd.x, crd.y);
 			string tempMonth = months[monthNum];
 			string outputMonth = "                                        ";
 			
-			for (int i = 0; i < tempMonth.length() - curLength; i++)
+			for (int i = 0; i < tempMonth.length() - curLength; ++i)
 			{
 				outputMonth[i] = tempMonth[i + curLength];
 			}
@@ -693,14 +700,12 @@ string getDynamicInput(Table::Coord crd)
 			for (int i = 0; i < 12; ++i)
 			{
 				tempTable.gotoxy(crd.x, crd.y + 1 + i);
-				for (int i = 0; i < 40; i++)
+				for (int j = 0; j < 40; ++j)
 					cout << " ";
 			}
 			
 			for (int i = 0; i < otherMonths.size(); ++i)
 			{
-				
-				
 				tempTable.gotoxy(crd.x, crd.y + 1 + i);
 				cout << otherMonths[i];
 				
@@ -715,6 +720,13 @@ string getDynamicInput(Table::Coord crd)
 
 		tempTable.gotoxy(tempCoord.x, tempCoord.y);
 	} while (isLoopGoing);
+
+	for (int i = 0; i < 12; ++i)
+	{
+		tempTable.gotoxy(crd.x, crd.y + i);
+		for (int j = 0; j < 40; ++j)
+			cout << " ";
+	}
 	
 	dynString = truncateString(dynString, dynString.length());
 	
@@ -736,4 +748,13 @@ string truncateString(string str, const int MAX_STR_LENGTH)
 	}
 
 	return str;
+}
+
+//FLUSH INPUT BUFFER
+//~~~~~~~~~~~~~~~~~~~
+void ignore_line(std::istream& in)
+{
+	char ch;
+	while (in.get(ch) && ch != '\n')
+		;
 }
